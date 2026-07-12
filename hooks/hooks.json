@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/studio-rules-inject.js"] },
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/studio-session-init.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "statusMessage": "Syncing vault...", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/session-log-backstop.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] },
+          { "type": "command", "statusMessage": "Syncing vault...", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/session-sync.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/log-skill.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/deploy-guard.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
+        ]
+      }
+    ]
+  }
+}

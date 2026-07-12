@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "overlord-studio-engine",
+  "description": "Overlord Studio plugins for Claude Code — the Studio Engine.",
+  "owner": {
+    "name": "Bharath Potlabathina"
+  },
+  "plugins": [
+    {
+      "name": "overlord-studio-engine",
+      "source": "./",
+      "description": "The Overlord Studio engine: personas, protocols, skills, commands, and hooks for a structured creative/technical studio, wired to your own vault of memory and projects.",
+      "author": {
+        "name": "Bharath Potlabathina"
+      },
+      "license": "MIT",
+      "keywords": [
+        "studio",
+        "personas",
+        "workflow",
+        "methodology",
+        "orchestration"
+      ]
+    }
+  ]
+}

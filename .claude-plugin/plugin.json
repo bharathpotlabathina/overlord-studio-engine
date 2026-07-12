@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "overlord-studio-engine",
+  "displayName": "Overlord Studio Engine",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Bharath Potlabathina"
+  },
+  "description": "The Overlord Studio engine: personas, protocols, skills, commands, and hooks for a structured creative/technical studio, wired to your own vault of memory and projects.",
+  "keywords": [
+    "studio",
+    "personas",
+    "workflow",
+    "methodology",
+    "orchestration"
+  ],
+  "userConfig": {
+    "vault_path": {
+      "type": "directory",
+      "title": "Studio vault path",
+      "description": "Absolute path to your studio vault (memory, projects, active context live here)."
+    }
+  }
+}

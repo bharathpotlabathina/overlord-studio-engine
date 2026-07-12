@@ -1,0 +1,108 @@
+#!/usr/bin/env node
+// Blocks commits that stage an oversized file, a secret, or an invalid Atlas map;
+// enforces plan-needs-spec; warns when verification wasn't logged. Node port of the
+// bash pre-commit. Installed via `git config core.hooksPath` -> runs cross-platform
+// (git honours the node shebang on macOS/Linux/Windows-Git-Bash).
+'use strict';
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const MAX_BYTES = 10485760;
+
+function git(args, opts = {}) {
+  return execFileSync('git', args, { encoding: 'utf8', ...opts });
+}
+function stagedFiles(filter) {
+  return git(['diff', '--cached', '--name-only', `--diff-filter=${filter}`])
+    .split('\n').map((s) => s.trim()).filter(Boolean);
+}
+function repoRoot() {
+  try { return git(['rev-parse', '--show-toplevel']).trim(); } catch { return process.cwd(); }
+}
+function fail(msg) { console.log(msg); process.exit(1); }
+
+const acm = stagedFiles('ACM');
+
+// --- Size guard ---
+const sizeOffenders = [];
+for (const f of acm) {
+  if (!fs.existsSync(f)) continue;
+  let size;
+  try { size = fs.statSync(f).size; } catch { size = undefined; }
+  if (size === undefined) sizeOffenders.push(`${f} (could not determine size — blocking to be safe)`);
+  else if (size > MAX_BYTES) sizeOffenders.push(`${f} (${Math.floor(size / 1048576)}MB)`);
+}
+if (sizeOffenders.length) {
+  console.log('COMMIT BLOCKED — staged file(s) over 10MB:');
+  sizeOffenders.forEach((o) => console.log('  ' + o));
+  process.exit(1);
+}
+
+// --- Secret scan ---
+const SECRET = /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|xox[baprs]-[A-Za-z0-9-]{10,}/;
+const secretOffenders = [];
+for (const f of acm) {
+  let content = '';
+  try { content = git(['show', `:${f}`]); } catch { /* not readable */ }
+  if (SECRET.test(content)) secretOffenders.push(f);
+  const base = path.basename(f);
+  if (['.env.example', '.env.sample', '.env.template'].includes(base)) { /* allowed */ }
+  else if (base === '.env' || base.startsWith('.env.')) {
+    secretOffenders.push(`${f} (raw env file — commit only .env.example/.sample/.template)`);
+  }
+}
+if (secretOffenders.length) {
+  console.log('COMMIT BLOCKED — staged file(s) look like they contain a secret:');
+  secretOffenders.forEach((o) => console.log('  ' + o));
+  console.log('If this is a false positive, adjust the content so it no longer matches a known key/token shape.');
+  process.exit(1);
+}
+
+// --- Atlas map validation ---
+const MAP_PATH = '_claude/studio-atlas-map.json';
+if (acm.includes(MAP_PATH)) {
+  const checker = path.join(__dirname, 'atlas-map-check.js');
+  if (!fs.existsSync(checker)) {
+    fail(`COMMIT BLOCKED — ${checker} not found, cannot validate ${MAP_PATH} (failing closed)`);
+  }
+  const tmp = path.join(os.tmpdir(), `atlas-map-staged-${process.pid}.json`);
+  try { fs.writeFileSync(tmp, git(['show', `:${MAP_PATH}`])); } catch { fs.writeFileSync(tmp, ''); }
+  let code = 0;
+  try { execFileSync('node', [checker, 'validate', tmp], { stdio: 'inherit' }); }
+  catch (e) { code = e.status || 1; }
+  fs.rmSync(tmp, { force: true });
+  if (code !== 0) fail(`COMMIT BLOCKED — ${MAP_PATH} failed validation, see errors above`);
+}
+
+// --- Plan-needs-spec gate ---
+const root = repoRoot();
+for (const f of stagedFiles('A')) {
+  if (!f.startsWith('docs/superpowers/plans/')) continue;
+  let text = '';
+  try { text = fs.readFileSync(path.join(root, f), 'utf8'); } catch { /* new file may be staged-only */ }
+  if (!text) { try { text = git(['show', `:${f}`]); } catch { /* ignore */ } }
+  if (/^\*\*Spec:\*\* none — (hotfix|small-change)/m.test(text)) continue;
+  const m = text.match(/docs\/superpowers\/specs\/[A-Za-z0-9._-]+\.md/);
+  if (!m || !fs.existsSync(path.join(root, m[0]))) {
+    fail(`COMMIT BLOCKED — ${f} has no spec reference (add a **Spec:** line pointing at docs/superpowers/specs/, or declare '**Spec:** none — hotfix')`);
+  }
+}
+
+// --- Verification-evidence WARN (never blocks) ---
+const logPath = path.join(root, '_claude', 'skill-invocations.log');
+if (fs.existsSync(logPath)) {
+  let last = '';
+  try { last = git(['log', '-1', '--format=%cI']).trim().slice(0, 19); } catch { /* no commits yet */ }
+  if (last) {
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n');
+    const found = lines.some((line) => {
+      const [ts, skill] = line.split(' | ');
+      return ts && ts > last && /verification-before-completion/.test(skill || '');
+    });
+    if (!found) console.log('WARNING — no verification-before-completion logged since last commit (harness reports, you decide)');
+  }
+}
+
+process.exit(0);

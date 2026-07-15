@@ -13,6 +13,42 @@ const { linkDir } = require('./platform.js');
 const PLUGIN = process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, '..');
 const EMPTY_MAP = '{"_schema":{"version":"3.0","atlas_version":"3.1.0"},"meta":{"product":"studio","generated":"","atlas_version":"3.1.0","author":"Atlas"},"capabilities":[],"relationships":[],"flows":[],"pillars":[]}\n';
 
+// Tier 0: loaded on EVERY session, so it holds only what makes a session correct —
+// identity and pointers, never status and never history. Deliberately carries no
+// @-import: see the note in scaffold().
+const CLAUDE_SEED = `# Studio
+
+Your vault. Session state lives in \`_claude/HANDOFF.md\` — read it at session open.
+
+**Keep this file small.** It is loaded on every session, so every line here is rent
+you pay forever. Identity and pointers belong here; status, history, and anything
+that only grows belong in a file that is read on demand.
+`;
+
+// Tier 1: the restore card. Fixed, small, overwritten at session close — never appended to.
+const HANDOFF_SEED = `# Handoff
+
+**Active:** (nothing yet)
+
+**Next actions:**
+
+**Pending decisions:**
+
+> Rewritten at session close, read at session open. Keep it a card, not a log —
+> if it is growing, the history belongs in \`_claude/session-log.md\`.
+`;
+
+// Vault-level switches, read by the tools. Defaults are the safe ones.
+const STUDIO_CONFIG_SEED = `personas=on
+
+# autosync — the Stop hook's git behaviour, in THIS repo, on every turn.
+#   off      do nothing (default). You commit by hand.
+#   commit   stage + commit locally, never push. Recoverable.
+#   on       stage + commit + push. Only for a vault you own.
+# Anything else — including a typo — is treated as off.
+autosync=off
+`;
+
 function ensureFile(p, content) { if (!fs.existsSync(p)) fs.writeFileSync(p, content); }
 function isGitRepo(dir) {
   try { execFileSync('git', ['-C', dir, 'rev-parse', '--git-dir'], { stdio: 'ignore' }); return true; }
@@ -24,13 +60,24 @@ function scaffold(V) {
     fs.mkdirSync(path.join(V, d), { recursive: true });
   }
   ensureFile(path.join(V, '_claude/memory/MEMORY.md'), '# Memory Index\n');
-  ensureFile(path.join(V, '_claude/memory/active_context.md'), '**Active project:** (none yet)\n');
   ensureFile(path.join(V, '_claude/studio-atlas-map.json'), EMPTY_MAP);
-  for (const f of ['backlog.md', 'session-log.md', 'HANDOFF.md', 'studio-brief.md']) {
+  for (const f of ['backlog.md', 'session-log.md', 'studio-brief.md']) {
     ensureFile(path.join(V, '_claude', f), `# ${f.replace(/\.md$/, '')}\n`);
   }
-  ensureFile(path.join(V, 'CLAUDE.md'), '@_claude/memory/active_context.md\n');
-  ensureFile(path.join(V, '_claude/.studio-config'), 'personas=on\n');
+  // The restore card: read at session open, written at session close. Small and
+  // fixed-size by design — it holds where-you-were, not what-happened.
+  ensureFile(path.join(V, '_claude/HANDOFF.md'), HANDOFF_SEED);
+
+  // NO @-import here, deliberately (2026-07-15). This file used to seed
+  // `@_claude/memory/active_context.md`, which pulled an ever-growing context
+  // file into EVERY session's fixed cost. In the studio that originated this
+  // engine that file reached 16,537 tokens — 81% of the per-session bill — and
+  // was retired: it was a derived view masquerading as a source, so every fact
+  // in it was owned somewhere else and drifted. A new vault must not inherit it.
+  // Load context on demand; never auto-import a file that only grows.
+  ensureFile(path.join(V, 'CLAUDE.md'), CLAUDE_SEED);
+
+  ensureFile(path.join(V, '_claude/.studio-config'), STUDIO_CONFIG_SEED);
   ensureFile(path.join(V, '_claude/repos.local'),
     `# This machine's git repos — one absolute path per line.\n${V}\n`);
   // Flavour scaffold: copy the _neutral fallback from the plugin, seed pointer to none.

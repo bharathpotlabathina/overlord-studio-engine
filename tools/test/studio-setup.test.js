@@ -28,9 +28,35 @@ test('scaffold produces a map that validates, and is idempotent', () => {
   assert.strictEqual(fs.readFileSync(path.join(vault, '_claude/flavours/active'), 'utf8').trim(), 'none');
 
   // Idempotent: second run doesn't throw and doesn't clobber
-  fs.writeFileSync(path.join(vault, 'CLAUDE.md'), '@_claude/memory/active_context.md\nCUSTOM\n');
+  fs.writeFileSync(path.join(vault, 'CLAUDE.md'), 'CUSTOM\n');
   execFileSync('node', [SETUP, 'scaffold', vault]);
   assert.match(fs.readFileSync(path.join(vault, 'CLAUDE.md'), 'utf8'), /CUSTOM/); // not overwritten
+});
+
+// A new vault must not inherit the studio's own retired mistake: an ever-growing
+// context file @-imported into every session. It reached 16,537 tokens — 81% of the
+// per-session cost — before it was killed. These assertions are the tripwire.
+test('scaffold NEVER seeds an @-import, and never creates active_context', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+
+  const claude = fs.readFileSync(path.join(vault, 'CLAUDE.md'), 'utf8');
+  assert.doesNotMatch(claude, /^@/m, 'CLAUDE.md must not @-import anything — it is loaded every session');
+  assert.doesNotMatch(claude, /active_context/, 'active_context must not be referenced');
+  assert.ok(!fs.existsSync(path.join(vault, '_claude/memory/active_context.md')),
+    'active_context.md must not be scaffolded — it is retired');
+
+  // Its replacement is the fixed-size restore card.
+  assert.ok(fs.existsSync(path.join(vault, '_claude/HANDOFF.md')), 'HANDOFF.md (restore card) must be scaffolded');
+  assert.match(claude, /HANDOFF/, 'CLAUDE.md should point at the restore card');
+});
+
+test('scaffold defaults autosync to OFF — a fresh vault never auto-pushes', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const cfg = fs.readFileSync(path.join(vault, '_claude/.studio-config'), 'utf8');
+  assert.match(cfg, /^autosync=off$/m, 'autosync must default to off in a scaffolded vault');
+  assert.doesNotMatch(cfg, /^autosync=on$/m);
 });
 
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {

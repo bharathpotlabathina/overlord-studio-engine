@@ -39,9 +39,13 @@ const HANDOFF_SEED = `# Handoff
 `;
 
 // Vault-level switches, read by the tools. Defaults are the safe ones.
-const STUDIO_CONFIG_SEED = `personas=on
-
-# autosync — the Stop hook's git behaviour, in THIS repo, on every turn.
+// KILLED 2026-07-15: `personas=on`. It was the CAP-025 persona-vs-role-generic
+// toggle (2026-07-06) and the flavour system superseded it nine days later —
+// `flavours/active` is the live switch, read by 2 tools; `personas` was read by
+// ZERO, in the engine and in the origin vault. A flag written into every vault
+// that switches nothing. Preflight's config check caught it. Do not re-add: if a
+// toggle is needed, the flavour system already is one.
+const STUDIO_CONFIG_SEED = `# autosync — the Stop hook's git behaviour, in THIS repo, on every turn.
 #   off      do nothing (default). You commit by hand.
 #   commit   stage + commit locally, never push. Recoverable.
 #   on       stage + commit + push. Only for a vault you own.

@@ -78,4 +78,4 @@ Active doc: `sessions/` root. Complete/superseded: move to `sessions/archive/`. 
 | `sot/<name>-strategy.md` | MEMORY.md: `[Project Strategy](path) — one-line status + phase` |
 | `sot/<name>-spec.md` | MEMORY.md: `[Project Spec](path) — one-line technical status` |
 | `wiki/<name>-digest.md` | MEMORY.md: `[Project Digest](path) — compiled synthesis` |
-| Open sessions/ brief | Named in `active_context.md` |
+| Open sessions/ brief | Named in `_claude/HANDOFF.md` |

@@ -13,11 +13,11 @@ Do the following in order:
    NEVER touch `Projects/*/sot/`. Source-of-truth files require the /update-source-of-truth gate and Director approval — the updater has no authority here.
 
    Steps:
-   1. Read `{{VAULT}}/_claude/memory/active_context.md` to understand what happened this session.
+   1. Read `git diff HEAD~1 --name-only` and `{{VAULT}}/_claude/HANDOFF.md` to understand what happened this session.
    2. Run `git -C "{{VAULT}}" diff HEAD~1 --name-only` to see what changed.
    3. For each changed file, check if any `_claude/` memory file or `Projects/*/docs/` reference doc contains stale facts about it (wrong status, old schema, old command, wrong path).
    4. Patch stale lines in-place. One sentence max per patch. Do not rewrite sections.
-   5. If something needs an Director decision to update correctly, append a `⚠️ [filename]: [what needs deciding]` line to `_claude/memory/active_context.md` under a `## Updater flags` section. Do not guess.
+   5. If something needs a Director decision to update correctly, REPORT it as a `⚠️ [filename]: [what needs deciding]` line in your return text. Do not write it to a file — step 2 owns the card, and two writers to one file is how it drifts. Do not guess.
    6. Report: files patched (list) + flags raised (list). Nothing else.
    ```
    If no files changed or scope is unclear, skip and note it.
@@ -43,10 +43,9 @@ Do the following in order:
    - <bullet, or "None">
    ```
 
-   This is a fast human-readable resume card. It supplements active_context.md — do not replace it.
+   This is the restore card and the state of record. Keep it a card, not a log: overwrite it, never append. If it is growing, the history belongs in `_claude/session-log.md`.
 
 3. **Update active context.**
-   - Update `{{VAULT}}/_claude/memory/active_context.md`: active project, last updated date, what was done this session, next action.
    - If any new preferences, decisions, or project facts were established, write them to the appropriate memory file and update MEMORY.md.
 
 4. **Append session-log entry.**
@@ -57,10 +56,10 @@ Do the following in order:
    Newest entries at bottom. The summary is fresh from steps 2–3 — write it here so it rides the commit in step 7. There is no hook or script behind this file; this step *is* the mechanism. Skip it and the log silently stops (as it did between 2026-06-23 and 2026-07-07).
 
 5. **Session checklist** — verify, do not answer from memory:
-   - [ ] **Active context accurate:** Read `active_context.md`. Confirm it reflects the session outcome.
+   - [ ] **Restore card accurate:** Read `_claude/HANDOFF.md`. Confirm it reflects the session outcome.
    - [ ] **Memory files current:** New rules, feedback, or project facts captured where appropriate.
    - [ ] **Session-log appended:** Confirm one line for this session was added to `session-log.md` (step 4).
-   - [ ] **No unresolved open items:** Anything raised but not resolved is noted in active_context.md.
+   - [ ] **No unresolved open items:** Anything raised but not resolved is noted in `_claude/HANDOFF.md`.
    - [ ] **Vault clean:** Run `git -C "{{VAULT}}" status`. Stage and commit anything outstanding.
    - [ ] **Other repos clean:** If `_claude/repos.local` exists, run `git -C "<repo>" status --short` for each listed repo (skip the vault — already checked above). Report any repo with uncommitted changes.
 

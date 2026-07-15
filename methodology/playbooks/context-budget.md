@@ -9,7 +9,6 @@ Measure the per-turn token cost of the Director vault's always-loaded `.claude/`
 1. **Identify always-loaded files** — these are injected into every session automatically:
    - `~/.claude/CLAUDE.md` (global user CLAUDE.md, which @-imports vault CLAUDE.md)
    - `{{VAULT}}/CLAUDE.md` (vault root CLAUDE.md)
-   - `{{VAULT}}/_claude/memory/active_context.md` (@-imported by vault CLAUDE.md)
    - `~/.claude/projects/<vault-project-dir>/memory/MEMORY.md` (auto-memory, always injected)
 
 2. **Read each always-loaded file** and count approximate tokens using: `token_count ≈ char_count / 4`. Report raw numbers only — never as percentages.
@@ -30,7 +29,7 @@ Measure the per-turn token cost of the Director vault's always-loaded `.claude/`
    `Always-loaded total: ~XXXX tokens`
 
    If the total exceeds **8000 tokens**, print a warning:
-   `⚠ WARNING: Always-loaded context exceeds 8000 tokens. Consider trimming MEMORY.md or active_context.md.`
+   `⚠ WARNING: Always-loaded context exceeds 8000 tokens. Consider trimming MEMORY.md or CLAUDE.md.`
 
    If under 8000, confirm: `OK: Within budget.`
 

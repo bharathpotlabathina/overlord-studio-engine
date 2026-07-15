@@ -164,9 +164,45 @@ function checkLeakScan() {
   catch (e) { return record('leak scan', false, ((e.stdout || '') + (e.stderr || '')).trim().split('\n').slice(0, 2).join(' ')); }
 }
 
+
+// 7. PLAYBOOK REFERENCES RESOLVE IN A COLD VAULT. The board's blind spot, added
+//    2026-07-15 after it passed a genuinely broken /login: the scaffolder had
+//    stopped creating active_context.md while login.md still told the session to
+//    read it. Removing a thing and leaving its READER is the same defect as
+//    building a thing and leaving it unwired — a dangling reader is silent too.
+//    Globs are skipped: `roles/x-domain-*.md` is legitimately optional.
+function checkPlaybookRefs() {
+  const v = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'preflight-refs-')), 'vault');
+  try { sh('node', [path.join(ROOT, 'tools/studio-setup.js'), 'scaffold', v]); }
+  catch { return record('playbooks → refs resolve cold', false, 'scaffold failed'); }
+
+  const bad = [];
+  const scan = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) { scan(p); continue; }
+      if (!e.name.endsWith('.md')) continue;
+      const body = fs.readFileSync(p, 'utf8');
+      for (const m of body.matchAll(/\{\{VAULT\}\}\/([A-Za-z0-9_./*-]+)/g)) {
+        const ref = m[1];
+        if (ref.includes('*')) continue;                 // optional payload glob
+        if (!fs.existsSync(path.join(v, ref)))
+          bad.push(`${path.relative(ROOT, p)} → ${ref}`);
+      }
+    }
+  };
+  scan(path.join(ROOT, 'methodology'));
+  scan(path.join(ROOT, 'commands'));
+  const uniq = [...new Set(bad)];
+  return record('playbooks → refs resolve cold', uniq.length === 0,
+    uniq.length ? `DANGLING READER: ${uniq.slice(0, 3).join(' · ')}${uniq.length > 3 ? ` (+${uniq.length - 3})` : ''}`
+                : 'every {{VAULT}} path a playbook names exists in a fresh vault');
+}
+
 function main() {
   checkHooks(); checkToolsInvoked(); checkSuite();
-  checkColdInstall(); checkConfigWired(); checkLeakScan();
+  checkColdInstall(); checkConfigWired(); checkPlaybookRefs(); checkLeakScan();
 
   const w = Math.max(...rows.map(r => r.name.length));
   process.stdout.write('\n  PREFLIGHT — ' + path.basename(ROOT) + '\n');

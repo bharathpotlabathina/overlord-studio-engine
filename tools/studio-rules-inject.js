@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Emitted into SessionStart additionalContext. Replaces the vault CLAUDE.md's job
-// (studio rules + active_context data-load + default persona), launch-dir-independent.
+// (studio rules + restore-card data-load + default persona), launch-dir-independent.
 // Degrades gracefully if vault_path isn't configured. Port of studio-rules-inject.sh.
 'use strict';
 const fs = require('fs');
@@ -26,7 +26,7 @@ Full constitution: ${PLUGIN}/methodology/handbook.md
 7. source-of-truth writes require explicit director approval — only via /update-source-of-truth.
 
 ## If no role is summoned
-- Read active_context (below) before starting work.
+- Read the restore card (below) before starting work.
 - Read the handbook before any structural or cross-project decision.
 
 ## Studio roles
@@ -38,9 +38,14 @@ function readIf(p) { try { return fs.readFileSync(p, 'utf8'); } catch { return n
 function main() {
   const out = [];
   out.push(RULES, '');
-  out.push('## Current active work (active_context.md)');
-  const ctx = VAULT ? readIf(path.join(VAULT, '_claude', 'memory', 'active_context.md')) : null;
-  out.push(ctx !== null ? ctx.replace(/\n$/, '') : '(no active_context.md yet — run /studio-setup)');
+  // The restore card, not a context log. This used to inject active_context.md —
+  // an append-only file that grew without bound and was paid for on EVERY session.
+  // It reached 16,537 tokens (81% of fixed cost) in the origin studio and was
+  // retired. HANDOFF.md replaces it and is small BY CONTRACT: it is overwritten at
+  // session close, never appended to.
+  out.push('## Where you left off (_claude/HANDOFF.md)');
+  const ctx = VAULT ? readIf(path.join(VAULT, '_claude', 'HANDOFF.md')) : null;
+  out.push(ctx !== null ? ctx.replace(/\n$/, '') : '(no HANDOFF.md yet — run /studio-setup)');
 
   const flav = ops(VAULT || PLUGIN).resolve();
   out.push('');

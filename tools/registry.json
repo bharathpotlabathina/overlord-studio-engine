@@ -48,6 +48,14 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 1.4 — Stop-hook skill audit (log-skill.js writes, skill-audit.js flags non-negotiable absence at session close). Report-only by dated exception (2026-07-14 WARN precedent). Fixes I-97: hook-wired (not /logout honor-system), and (none)/absence are loud flags."
+    },
+    {
+      "id": "posix-only-guard",
+      "trigger": "test/run-smoke.js",
+      "check": "tools/checks/posix-only-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 1.5 / B1 recurrence guard — call-shaped grep for POSIX-only primitives (flock, shell spawns, shell shebangs) across tools/. One dated exception (studio-session-init.js, dies at Task 2.3), printed loudly on every run. Windows RUN parked (Q7 substrate); smoke prepared as test/run-smoke.js."
     }
   ],
   "documents": []

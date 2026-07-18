@@ -108,3 +108,17 @@ a superseding proof gets a new entry.
 **Report-only status:** dated exception preserved (2026-07-14 WARN precedent) — invocation presence is a proxy, so the wire warns and never blocks. Recorded in the registry note.
 
 **Suite:** 109/109.
+
+---
+
+## Task 1.5 — Windows smoke prep + B1 POSIX-only recurrence guard (2026-07-19)
+
+**Files:** `tools/checks/posix-only-check.js` (B1 guard, registered in the doctor) · `test/run-smoke.js` (cross-platform one-command smoke: discovers test files itself — no shell globbing, cmd.exe-safe — runs the suite + the guard).
+
+**First live run caught a real violation:** `studio-session-init.js` spawns `bash` for the legacy vault self-heal. It is `!isWin`-fenced (never executes on Windows) and already condemned to die at Task 2.3's SessionStart consolidation → recorded as a **dated exception, printed loudly on every run** (fail-loud discipline: an exception is explicit and dated, never a silent allowlist).
+
+**Mutation (plan acceptance):** seeded `execFileSync('bash', ...)` into `flavour.js` → guard goes red naming the file; reverted → `scanned 19 tool files, 0 violations, 1 dated exception`, exit 0.
+
+**macOS smoke:** `node test/run-smoke.js` → `smoke: PASS (suite + posix-only guard)` (109 tests + guard). **The Windows RUN is PARKED** — no Windows substrate exists on this machine (Q7: default UTM VM, no OS downloaded autonomously per standing order). AWAITING OVERLORD: substrate choice/installation; the smoke is one command once a box exists.
+
+**Doctor:** `checked 6, found 6 green · mechanism count: 6`.

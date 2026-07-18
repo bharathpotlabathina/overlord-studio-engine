@@ -1,0 +1,14 @@
+{
+  "wiringRoots": ["hooks"],
+  "mechanisms": [
+    {
+      "id": "registry-doctor",
+      "trigger": "tools/doctor.js",
+      "check": "tools/checks/registry-schema-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "bootstrap entry — the registry+doctor pair registers itself. Full seed from the old studio happens at Task 0.2a (reality sweep); nothing else migrates before then."
+    }
+  ],
+  "documents": []
+}

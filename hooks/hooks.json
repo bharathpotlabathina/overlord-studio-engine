@@ -4,7 +4,8 @@
       {
         "hooks": [
           { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/studio-rules-inject.js"] },
-          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/studio-session-init.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/studio-session-init.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] },
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/infra-check.js"] }
         ]
       }
     ],

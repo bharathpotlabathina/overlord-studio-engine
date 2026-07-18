@@ -1,0 +1,123 @@
+#!/usr/bin/env node
+// Task 1.3 (Stage 3 Phase 1) — infra-check: live-state invariant boundary patrol.
+// The airgap-grade prod rule's standing check: no dev/preview context may reach a
+// production identifier. Config-driven (infra-check.json at the repo root names the
+// prod identifiers and where to look). Invariant groups, each applicable only when
+// its inputs exist on this machine:
+//   env      — preview/dev env files must not contain a prod identifier
+//   rls      — every CREATE TABLE in the migrations corpus has a matching
+//              ENABLE ROW LEVEL SECURITY (static scan; the live-DB half is the
+//              Release Engineer's operational runbook step, not this tool)
+//   dupes    — no duplicate migration numbers (reuses migration-guard)
+//   pgpass   — ~/.pgpass carries no prod host (M4 tool-default vector)
+//   mcp      — MCP config files carry no prod project ref (M4)
+//   vercel   — .vercel/project.json is not linked to a prod project id (M4)
+// Cold install (m6): zero infra configured -> explicit N/A line, exit 0. Never an
+// error on missing config, never a hollow "all green" implying prod was verified.
+// ponytail: static-file checks only — anything needing a live connection is a
+// runbook step; this tool must be safe to run cold, offline, unattended.
+'use strict';
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { check: dupeCheck } = require('./migration-guard.js');
+
+const GROUP_COUNT = 6;
+
+function loadConfig(root) {
+  const p = path.join(root, 'infra-check.json');
+  if (!fs.existsSync(p)) return null;
+  return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+
+function containsProdId(text, prodIds) {
+  return prodIds.find((id) => text.includes(id));
+}
+
+function main() {
+  const root = process.cwd();
+  const cfg = loadConfig(root);
+  if (!cfg || !Array.isArray(cfg.prodIdentifiers) || cfg.prodIdentifiers.length === 0) {
+    console.log(`no infra configured — 0 of ${GROUP_COUNT} invariant groups applicable (cold install)`);
+    return 0;
+  }
+  const prodIds = cfg.prodIdentifiers;
+  const failures = [];
+  let checked = 0;
+
+  // env group
+  for (const f of cfg.envFiles || []) {
+    const p = path.join(root, f);
+    if (!fs.existsSync(p)) continue;
+    checked += 1;
+    const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
+    if (hit) failures.push(`${f}: contains prod identifier "${hit}" — preview/dev must never point at prod`);
+  }
+
+  // rls + dupes groups (per migrations dir)
+  for (const dir of cfg.migrationsDirs || []) {
+    const abs = path.join(root, dir);
+    if (!fs.existsSync(abs)) continue;
+    const sqlFiles = fs.readdirSync(abs).filter((f) => f.endsWith('.sql'));
+    const corpus = sqlFiles.map((f) => fs.readFileSync(path.join(abs, f), 'utf8')).join('\n');
+    checked += 1;
+    const created = [...corpus.matchAll(/CREATE TABLE (?:IF NOT EXISTS )?"?([\w.]+)"?/gi)].map((m) => m[1]);
+    for (const t of created) {
+      const bare = t.split('.').pop();
+      const rls = new RegExp(`ALTER TABLE (?:IF EXISTS )?"?(?:[\\w]+\\.)?${bare}"? ENABLE ROW LEVEL SECURITY`, 'i');
+      if (!rls.test(corpus)) failures.push(`${dir}: table "${t}" created without ENABLE ROW LEVEL SECURITY`);
+    }
+    checked += 1;
+    // dupeCheck prints its own findings; capture via return code only.
+    const origLog = console.log;
+    let dupeOut = '';
+    console.log = (s) => { dupeOut += s + '\n'; };
+    const dupeCode = dupeCheck(abs);
+    console.log = origLog;
+    if (dupeCode !== 0) failures.push(`${dir}: ${dupeOut.trim().replace(/\n/g, ' · ')}`);
+  }
+
+  // pgpass group (M4)
+  if (cfg.pgpass) {
+    const p = path.join(os.homedir(), '.pgpass');
+    if (fs.existsSync(p)) {
+      checked += 1;
+      const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
+      if (hit) failures.push(`~/.pgpass: carries prod host "${hit}" — a dev-context tool default reaching prod (M4)`);
+    }
+  }
+
+  // mcp group (M4)
+  for (const f of cfg.mcpConfigs || []) {
+    const p = path.isAbsolute(f) ? f : path.join(root, f);
+    if (!fs.existsSync(p)) continue;
+    checked += 1;
+    const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
+    if (hit) failures.push(`${f}: MCP config resolves to prod identifier "${hit}" (M4)`);
+  }
+
+  // vercel group (M4)
+  {
+    const p = path.join(root, '.vercel', 'project.json');
+    if (fs.existsSync(p)) {
+      checked += 1;
+      const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
+      if (hit) failures.push(`.vercel/project.json: linked to prod project "${hit}" (M4)`);
+    }
+  }
+
+  if (checked === 0) {
+    console.log(`no infra configured — 0 of ${GROUP_COUNT} invariant groups applicable (cold install)`);
+    return 0;
+  }
+  if (failures.length) {
+    console.log(`INFRA-CHECK FAILED — ${failures.length} invariant violation(s):`);
+    failures.forEach((f) => console.log('  ' + f));
+    return 1;
+  }
+  console.log(`checked ${checked} invariant${checked === 1 ? '' : 's'}, all hold`);
+  return 0;
+}
+
+if (require.main === module) process.exit(main());
+module.exports = { main };

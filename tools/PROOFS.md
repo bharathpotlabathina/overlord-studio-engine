@@ -71,3 +71,24 @@ a superseding proof gets a new entry.
 **Mutation (the plan's exact prescription):** replaced the atomic `mkdirSync` claim loop with a naive read-check-write (`existsSync` → 30ms spin → `mkdirSync {recursive:true}`, which never throws EEXIST) → test FAILS: `expected 8 distinct numbers, got ["017","017","017","017","017","017","017","017"]` — the historical four-branches-claiming-017 failure reproduced in miniature, proving coordination (not luck) is why the numbers are distinct. Restored the atomic version → 96/96 green.
 
 **B1 compliance:** no `flock` anywhere; the primitive is `fs.mkdirSync` (atomic on every Node platform). POSIX-only grep over `tools/` clean.
+
+---
+
+## Task 1.3 — `infra-check` invariant script (2026-07-19)
+
+**Files:** `tools/infra-check.js` · `tools/test/infra-check.test.js` · wired to SessionStart (`hooks/hooks.json`) + `tools/pre-push` (new Node gate, cutover target for the bash pre-push wire).
+
+**Red:** 7/7 tests failing before implementation. **Green:** 7/7 after.
+
+**Acceptance mutations (each proven fail→revert→pass in the tests):**
+- Preview env file pointing at the prod DB identifier → FAIL, file and identifier named; revert → pass.
+- `CREATE TABLE` without `ENABLE ROW LEVEL SECURITY` in the migrations corpus → FAIL naming the table; add the ALTER → pass.
+- Duplicate migration numbers → FAIL (reuses migration-guard's detector — one detector, two wires).
+- `~/.pgpass` entry carrying a prod host → FAIL (M4 tool-default vector); remove → pass.
+- MCP config resolving to a prod project ref → FAIL (M4); revert → pass.
+- Clean configured state → `checked N invariants, all hold` (positive proof).
+- **Cold install (m6):** zero config → `no infra configured — 0 of 6 invariant groups applicable (cold install)`, exit 0 — verified live on the engine repo itself.
+
+**Honest limits (registered, not hidden):** the RLS group is a STATIC scan of the migrations corpus; live-DB RLS verification (enabled+forced on the running database) needs a connection and is a Release Engineer runbook step, not this offline tool. Cloudflare token *scope* is not offline-verifiable and is not claimed as checked.
+
+**Doctor state after registration:** `checked 4, found 4 green · mechanism count: 4`, exit 0 — the `hooks/hooks.json` orphan from Task 0.1's live run is now claimed by the infra-check mechanism entry. Full suite 103/103.

@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+// Node pre-push gate (Task 1.3 wiring) — runs infra-check before any push.
+// Cold-safe: with no infra-check.json at the repo root, infra-check prints its
+// explicit N/A line and exits 0 (m6), so this gate never blocks a cold install.
+// This file is the cutover TARGET for the vault-side bash pre-push (wire W11);
+// the dist-leak/preflight half of W11 migrates separately and nothing retires
+// until this replacement is proven (0.2b discipline).
+'use strict';
+const { execFileSync } = require('child_process');
+const path = require('path');
+
+try {
+  execFileSync('node', [path.join(__dirname, 'infra-check.js')], { stdio: 'inherit' });
+} catch (e) {
+  console.log('PUSH BLOCKED — infra-check failed (see violations above).');
+  process.exit(e.status || 1);
+}
+process.exit(0);

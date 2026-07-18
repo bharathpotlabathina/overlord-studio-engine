@@ -13,6 +13,7 @@
       {
         "hooks": [
           { "type": "command", "statusMessage": "Syncing vault...", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/session-log-backstop.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] },
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/skill-audit.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] },
           { "type": "command", "statusMessage": "Syncing vault...", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/tools/session-sync.js", "${CLAUDE_PLUGIN_OPTION_VAULT_PATH}"] }
         ]
       }

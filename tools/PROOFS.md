@@ -92,3 +92,19 @@ a superseding proof gets a new entry.
 **Honest limits (registered, not hidden):** the RLS group is a STATIC scan of the migrations corpus; live-DB RLS verification (enabled+forced on the running database) needs a connection and is a Release Engineer runbook step, not this offline tool. Cloudflare token *scope* is not offline-verifiable and is not claimed as checked.
 
 **Doctor state after registration:** `checked 4, found 4 green · mechanism count: 4`, exit 0 — the `hooks/hooks.json` orphan from Task 0.1's live run is now claimed by the infra-check mechanism entry. Full suite 103/103.
+
+---
+
+## Task 1.4 — Skill-firing audit at session close (2026-07-19)
+
+**Files:** `tools/skill-audit.js` (new, Node rebuild of the bash audit) · `tools/test/skill-audit.test.js` (also covers the previously-untested `log-skill.js`) · Stop-hook wire added in `hooks/hooks.json`.
+
+**I-97's two defects, fixed:** (1) the audit only ran when the `/logout` ritual was followed — now a Stop-hook wire, firing regardless; (2) `(none)` read as success — an empty window and a missing non-negotiable are now loud `SKILL-AUDIT FLAG` lines with exit 1.
+
+**Red:** 5/6 failing before `skill-audit.js` existed (the 6th — log-skill append — passed against the existing logger, which gained its first test coverage here). **Green:** 6/6.
+
+**Acceptance (simulated session windows, per plan):** a build-shaped window that skipped `verification-before-completion` → flagged, exit 1; a window that fired it → clean positive proof (`audited N skill invocations`), exit 0; prior-session invocations correctly excluded by the boundary-marker window (yesterday's verification does not cover today).
+
+**Report-only status:** dated exception preserved (2026-07-14 WARN precedent) — invocation presence is a proxy, so the wire warns and never blocks. Recorded in the registry note.
+
+**Suite:** 109/109.

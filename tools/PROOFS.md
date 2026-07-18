@@ -37,7 +37,7 @@ a superseding proof gets a new entry.
 
 **Method:** six parallel read-only fleet agents (hooks / skills / setup scripts / playbooks / gates / git-hook wiring), every declared wire tested against the machine.
 
-**Result:** 20 declared wires inventoried (12 live, 8 dead-or-duplicate), zero `unknown` disposition tags. `N_old_live = 12`, `N_old_declared = 20`, projected `N_new ≈ 17–21` → **the Law-5 projection FAILS under the live-only baseline** — surfaced as a Phase-0 finding for the Overlord per the plan's own instruction, recorded in `registry.json.law5Baseline`.
+**Result:** 20 declared wires inventoried (12 live, 8 dead-or-duplicate), zero `unknown` disposition tags. `N_old_live = 12`, `N_old_declared = 20`, projected `N_new ≈ 17–21` → **the Law-5 projection FAILS under the live-only baseline** — surfaced as a Phase-0 finding for the Director per the plan's own instruction, recorded in `registry.json.law5Baseline`.
 
 **Mutation check (per Task 0.2a acceptance):**
 - Green: `node docs/superpowers/absorption/sweep-crosscheck.js` → `cross-checked 20 machine wires, all present in inventory`, exit 0.

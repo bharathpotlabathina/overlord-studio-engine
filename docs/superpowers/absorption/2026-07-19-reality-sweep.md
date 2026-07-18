@@ -38,20 +38,20 @@ One row = one declared trigger→check pair. `source-key` is machine-derived and
 | W17 | enginehooks:PostToolUse:log-skill.js | engine `hooks/hooks.json` | same | migrate (target of W07; rebuilt in Task 1.4) |
 | W18 | enginehooks:PreToolUse:deploy-guard.js | engine `hooks/hooks.json` | same | migrate (target of W08, after the `--no-verify` gap closes) |
 | W19 | enginegit:pre-push | engine `.git/hooks/pre-push` (literal, old-style) | `core.hooksPath` is set on the repo, so git never consults `.git/hooks/` — superseded by W11, which is a strict superset | retire |
-| W20 | studiovault:post-commit | `studio-vault/.githooks/post-commit` | hooksPath never set on that repo; repo itself is an abandoned pre-vault iteration (no remote, stale since 2026-06-11) | retire (with the whole repo's status flagged to the Overlord) |
+| W20 | studiovault:post-commit | `studio-vault/.githooks/post-commit` | hooksPath never set on that repo; repo itself is an abandoned pre-vault iteration (no remote, stale since 2026-06-11) | retire (with the whole repo's status flagged to the Director) |
 
 **Not wires (correctly excluded from the count):** all 21 vault playbook-commands + 18 engine plugin-commands (verified working end-to-end, zero unknowns — but they are ritual/prose mechanisms, DOCUMENTS under the Task 0.1 rule) · `skill-audit.sh` (invoked by the `/logout` playbook, honor-system prose — the exact degradation class Task 1.4 fixes) · `atlas-map-check.py` and `preflight.js` (sub-checks of W10/W11, same trigger) · `handoff-age.sh`/`retro-count.sh` (sub-checks of W01) · meera/owner subagents · the new `registry-doctor` (Stage-3 wire, counts in N_new).
 
 ---
 
-## B. N_old — the Law-5 baseline, and a definitional finding for the Overlord
+## B. N_old — the Law-5 baseline, and a definitional finding for the Director
 
 **Counting unit (Task 0.1, B2):** one mechanism = one registered trigger→check pair. Same unit both sides, no switch permitted.
 
 - **N_old (live wires): 12** — W01–W12.
 - **Declared surface including dead/duplicate declarations: 20** — W01–W20 (of which 6 are vault↔engine DUPLICATE declarations of the same mechanism, and 2 are corpses).
 
-**⚠️ FINDING (surfaced now, per the plan's own instruction):** the projected arithmetic below shows **`N_new ≥ N_old` under the live-only baseline**. The Law-5 gate only closes comfortably if N_old counts the 8 dead/duplicate declarations — i.e., the count "goes down" mostly by deleting corpses and collapsing duplicate declarations, while **live machinery grows** (~12 → ~18). Which baseline binds is the Overlord's call, parked in HANDOFF → Pending Overlord decisions. The sweep does not fudge either number.
+**⚠️ FINDING (surfaced now, per the plan's own instruction):** the projected arithmetic below shows **`N_new ≥ N_old` under the live-only baseline**. The Law-5 gate only closes comfortably if N_old counts the 8 dead/duplicate declarations — i.e., the count "goes down" mostly by deleting corpses and collapsing duplicate declarations, while **live machinery grows** (~12 → ~18). Which baseline binds is the Director's call, parked in HANDOFF → the Director's pending-decision queue. The sweep does not fudge either number.
 
 ### Projected arithmetic (B2)
 
@@ -63,7 +63,7 @@ Planned removals/consolidations: W12 retired (−1) · W01+W02+W03 → one Sessi
 - vs N_old = 12 (live-only): **FAILS Law 5** (17–21 ≥ 12).
 - vs N_old = 20 (all declared): passes narrowly at the low end (17 < 20), fails at the high end.
 
-Either way this is not the comfortable margin the plan assumed — the honest statement is that Studio 2.0 as planned adds live standing machinery (detectors the old studio never had: doctor, infra-check, event wires) and removes declarations. The tractor's "delete beats instrument" and the plan's rigor additions are in real tension here; the resolution is the Overlord's, not the fleet's.
+Either way this is not the comfortable margin the plan assumed — the honest statement is that Studio 2.0 as planned adds live standing machinery (detectors the old studio never had: doctor, infra-check, event wires) and removes declarations. The tractor's "delete beats instrument" and the plan's rigor additions are in real tension here; the resolution is the Director's, not the fleet's.
 
 ---
 
@@ -71,13 +71,13 @@ Either way this is not the comfortable margin the plan assumed — the honest st
 
 1. **The engine plugin is not installed.** All six `hooks/hooks.json` wires are inert by construction; nothing on this machine loads them. Everything live is vault-side bash via `~/.claude/settings.json` (hand-written by `studio-setup.sh`). Reading hooks.json alone looks complete and correct — nothing fires. (This is the documented two-track state from 2026-07-15, but the sweep confirms zero engine mechanisms have ever run in production.)
 2. **The engine's `tools/pre-commit` header claim is false.** "Installed via `git config core.hooksPath`" — no repo anywhere points at it. All 6 studio repos + 4 worktrees share the vault's `.githooks` bash pair. The Node port also silently LACKS the I-55 map-provenance check the live bash version enforces; `deploy-guard.js` likewise lacks the live version's `--no-verify` block. **Porting as-is would silently weaken two gates.**
-3. **Task 3.3's local-auth helper has no artifact on disk.** HANDOFF and the plan describe the macOS LocalAuthentication dialog as "dry-run validated this session (exit 0)" — an exhaustive search (LocalAuthentication, deviceOwnerAuthentication, LAContext, osascript auth helpers, *.swift) finds **no file anywhere** in either repo. Either the dry-run was a one-off never saved, or the claim is aspirational-recorded-as-done. Task 3.3 has zero prior art to build on; flagged to the Overlord.
+3. **Task 3.3's local-auth helper has no artifact on disk.** HANDOFF and the plan describe the macOS LocalAuthentication dialog as "dry-run validated this session (exit 0)" — an exhaustive search (LocalAuthentication, deviceOwnerAuthentication, LAContext, osascript auth helpers, *.swift) finds **no file anywhere** in either repo. Either the dry-run was a one-off never saved, or the claim is aspirational-recorded-as-done. Task 3.3 has zero prior art to build on; flagged to the Director.
 4. **Doc drift runs in BOTH directions.** Engine behind vault: `doc-protocol.md` + `wiki-schema.md` still present the killed CAP-018 wiki as live (vault's copy was fixed; engine's never patched). Vault behind engine: vault `flavour.md` still says the loader "ships in Plan 2" (live since 2026-07-15); vault `flavour-setup` skill says "8 roles" (engine correctly says 9). Plus one doc-vs-itself: `studio-brief.md`'s pipeline section contradicts its own roster section 30 lines up.
 5. **A fresh `/tmp` prod-push clone bypasses every gate.** `core.hooksPath` is per-repo local config; the ephemeral client-site push clone gets none of the studio gates on re-clone. Distinct from Task 1.3's infra-check; needs either a hooked clone step or an explicit acceptance.
 
 Confirmed-zero baselines (honest absences, not bugs): no infra-check-class invariant exists anywhere yet (Task 1.3 builds from nothing) · no migration-number ledger exists (Task 1.1 builds from nothing) · `/login` retirement stands confirmed (its auto-half already lives in W01; the ritual half is the part that dies).
 
-**Documents settled by the sweep:** `studio-brief.md` "What's Missing" — 6 of 9 items resolved, 2 partial, 1 still-true-by-design (details in the playbooks agent record; brief needs a rewrite pass, not patches) · `STUDIO-ROLE-AUDIT-BRIEF.md` and the 2026-05-30 invoker audit brief → retire-as-historical (kills preserved) · `wiki-schema.md` → retire · engine `studio-pipeline.md` → migrate-with-rewrite (no Release stage yet) · engine `handbook.md`, `subagent-brief-template.md`, both repos' summon/session playbooks → migrate-as-is (all verified current). Naming drift at cutover: `/update-sot` (vault) vs `/update-source-of-truth` (engine) — alias or rename before muscle memory 404s. `retro-integrate` was never ported to the engine — port or park explicitly. The `atlas@overlord-studio` installed plugin is one commit stale vs the live hand-symlink (still shows the dead Ice Box pillar) — reconcile or retire the plugin entry.
+**Documents settled by the sweep:** `studio-brief.md` "What's Missing" — 6 of 9 items resolved, 2 partial, 1 still-true-by-design (details in the playbooks agent record; brief needs a rewrite pass, not patches) · `STUDIO-ROLE-AUDIT-BRIEF.md` and the 2026-05-30 invoker audit brief → retire-as-historical (kills preserved) · `wiki-schema.md` → retire · engine `studio-pipeline.md` → migrate-with-rewrite (no Release stage yet) · engine `handbook.md`, `subagent-brief-template.md`, both repos' summon/session playbooks → migrate-as-is (all verified current). Naming drift at cutover: the vault's short source-of-truth command name vs the engine's `/update-source-of-truth` — alias or rename before muscle memory 404s. `retro-integrate` was never ported to the engine — port or park explicitly. The `atlas@overlord-studio` installed plugin is one commit stale vs the live hand-symlink (still shows the dead Ice Box pillar) — reconcile or retire the plugin entry.
 
 ---
 

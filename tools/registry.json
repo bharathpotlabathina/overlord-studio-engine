@@ -16,6 +16,22 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "bootstrap entry — the registry+doctor pair registers itself. Full seed from the old studio happens at Task 0.2a (reality sweep); nothing else migrates before then."
+    },
+    {
+      "id": "migration-number-gate",
+      "trigger": "tools/pre-commit",
+      "check": "tools/test/migration-guard.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 1.1 — duplicate-migration-number pre-commit gate + claim ledger (atomic mkdirSync, no flock). Ships to client repos."
+    },
+    {
+      "id": "reservation-race-check",
+      "trigger": "tools/migration-guard.js",
+      "check": "tools/test/reservation-race.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 1.2 — concurrent-claim atomicity self-check (Check B): 8 claimers, distinct sequential numbers."
     }
   ],
   "documents": []

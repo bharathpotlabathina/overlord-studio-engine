@@ -60,6 +60,40 @@ if (secretOffenders.length) {
   process.exit(1);
 }
 
+// --- Duplicate migration-number gate (Task 1.1) ---
+// Groups staged migration-shaped files (a path segment named "migrations",
+// basename starting with digits) by (dir, number); any pair sharing a number
+// blocks the commit. Checks staged names only — deterministic, no repo scan.
+{
+  const byKey = new Map();
+  for (const f of acm) {
+    const parts = f.split('/');
+    const mi = parts.indexOf('migrations');
+    if (mi === -1 || mi === parts.length - 1) continue;
+    const num = (parts[parts.length - 1].match(/^(\d+)/) || [])[1];
+    if (!num || parts[mi + 1] === 'RESERVED') continue;
+    const key = parts.slice(0, mi + 1).join('/') + ':' + num;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(f);
+  }
+  // Also collide staged files against already-committed neighbours with the same number.
+  for (const [key, staged] of byKey) {
+    const [dir, num] = key.split(':');
+    let existing = [];
+    try {
+      existing = git(['ls-files', dir]).split('\n').filter((f) =>
+        f && !staged.includes(f) && (path.basename(f).match(/^(\d+)/) || [])[1] === num);
+    } catch { /* dir may not be tracked yet */ }
+    const all = [...staged, ...existing];
+    if (all.length > 1) {
+      console.log(`COMMIT BLOCKED — migration number ${num} claimed by more than one file:`);
+      all.forEach((f) => console.log('  ' + f));
+      console.log('Reserve numbers before work: node tools/migration-guard.js claim --dir <migrations-dir> --name <migration_name>');
+      process.exit(1);
+    }
+  }
+}
+
 // --- Atlas map validation ---
 const MAP_PATH = '_claude/studio-atlas-map.json';
 if (acm.includes(MAP_PATH)) {

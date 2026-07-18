@@ -44,3 +44,30 @@ a superseding proof gets a new entry.
 - Red: removed the W10 row (`githooks:pre-commit`) from a scratch copy of the report → `SWEEP CROSS-CHECK FAILED: 1 machine wire(s) absent from the inventory: githooks:pre-commit`, exit 1.
 - Restored: original report → green again, exit 0.
 - The checker also fails loudly if it derives zero wires from the machine (silence ≠ success on the derivation side).
+
+---
+
+## Task 1.1 — Migration-number reservation ledger + duplicate-number pre-commit gate (2026-07-19)
+
+**Files:** `tools/migration-guard.js` · `tools/test/migration-guard.test.js` · duplicate-number gate wired into `tools/pre-commit`.
+
+**Red:** `node --test tools/test/migration-guard.test.js` before implementation → 5/6 fail (the 6th passed vacuously — both invocations erroring identically; noted, and it went red-able once real behavior existed).
+
+**Green:** after implementation → 6/6 pass.
+
+**Mutation / acceptance (plan Check A, run against the REAL gate in a scratch git repo):**
+- Stage `migrations/017_add_users.sql` + `migrations/017_add_orders.sql` → `tools/pre-commit` exits 1: `COMMIT BLOCKED — migration number 017 claimed by more than one file`.
+- Unstage one → exits 0.
+- Commit `017_add_users.sql`, then stage a NEW `017_sneaky.sql` → blocked against the already-committed neighbour too (staged-vs-tracked collision path).
+
+**Full suite:** 95/95 (89 prior + 6 new).
+
+## Task 1.2 — Concurrent-claim atomicity self-check (2026-07-19)
+
+**Files:** `tools/test/reservation-race.test.js`.
+
+**Green (atomic primitive in place):** 8 concurrent claimers → `race check: 8 claimers, 8 distinct sequential numbers — coordination held`.
+
+**Mutation (the plan's exact prescription):** replaced the atomic `mkdirSync` claim loop with a naive read-check-write (`existsSync` → 30ms spin → `mkdirSync {recursive:true}`, which never throws EEXIST) → test FAILS: `expected 8 distinct numbers, got ["017","017","017","017","017","017","017","017"]` — the historical four-branches-claiming-017 failure reproduced in miniature, proving coordination (not luck) is why the numbers are distinct. Restored the atomic version → 96/96 green.
+
+**B1 compliance:** no `flock` anywhere; the primitive is `fs.mkdirSync` (atomic on every Node platform). POSIX-only grep over `tools/` clean.

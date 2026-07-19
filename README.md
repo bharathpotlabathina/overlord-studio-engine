@@ -26,9 +26,11 @@ Runs on **macOS, Linux, and Windows** — the runtime is Node (which Claude Code
 ## Install
 
 ```
-/plugin marketplace add <this-repo-url>
+/plugin marketplace add https://github.com/bharathpotlabathina/overlord-studio-engine
 /plugin install overlord-studio-engine@overlord-studio-engine
 ```
+
+(Working from a local clone? `/plugin marketplace add /path/to/your/clone` works the same way.)
 
 Then set the **`vault_path`** config when prompted (or point it at an existing vault), and run first-time setup:
 
@@ -39,6 +41,17 @@ Then set the **`vault_path`** config when prompted (or point it at an existing v
 `/studio-setup` scaffolds the vault, links memory into `~/.claude`, points git hooks at the plugin, prints a permissions allow-list to paste, and runs the **Flavour** first-time-user funnel. It's idempotent — safe to re-run; `/login` calls it each session to self-heal.
 
 > The first run is prompt-heavy (each setup step is permission-prompted) until you paste the allow-list from Step 4. After that, sessions are quiet.
+
+### Verify your install
+
+From the plugin/clone directory, two commands prove the engine is healthy — no setup needed:
+
+```
+node --test tools/test/*.test.js    # the full engine test suite
+node tools/doctor.js                # the wiring registry health check
+```
+
+Both must come back clean (suite all-pass; doctor reports every mechanism green).
 
 ## Flavour — the theming layer
 
@@ -62,6 +75,8 @@ Summon any role for deep interactive work; the orchestrator dispatches bounded w
 | `/summon-hardware` | Hardware / firmware / device platform |
 | `/summon-mobile` | Mobile — Android/iOS app build (cross-platform-first) |
 | `/summon-behavioral` | Behavioral / verification counterweight |
+| `/summon-release` | Release engineering — environments, release composition; gates production |
+| `/summon-security` | Security engineering — security certificates feed every go/no-go |
 
 Other commands: `/login` · `/logout` · `/flavour` · `/project-health` · `/context-budget` · `/silent-failure-hunter` · `/atlas-propose` · `/atlas-map-review` · `/update-source-of-truth`.
 

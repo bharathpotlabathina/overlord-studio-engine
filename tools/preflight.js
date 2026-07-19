@@ -200,9 +200,24 @@ function checkPlaybookRefs() {
                 : 'every {{VAULT}} path a playbook names exists in a fresh vault');
 }
 
+// 8. Target-tier battery — the engine's value claim is "built at top tier, RUNS
+//    at the distribution tier" (decision 2026-07-19; the model tier is a target
+//    platform, same class as the Windows lesson). The claim is only real if cold
+//    distribution-tier agents have actually driven the user-facing flows. The
+//    board cannot prove those runs were honest — it proves a run is RECORDED
+//    (file + Last-run date + verdict) and surfaces it for the human to judge
+//    staleness against what changed since.
+function checkTargetTier() {
+  const p = path.join(ROOT, 'test/target-tier-battery.md');
+  if (!fs.existsSync(p)) return record('target-tier battery → recorded', false, 'test/target-tier-battery.md missing — run the battery');
+  const m = fs.readFileSync(p, 'utf8').match(/^Last run:\s*(\S+).*verdict:\s*(\S+)/mi);
+  if (!m) return record('target-tier battery → recorded', false, 'no "Last run: <date> ... verdict: <v>" line');
+  return record('target-tier battery → recorded', true, `${m[1]} verdict ${m[2]} — judge staleness on read`);
+}
+
 function main() {
   checkHooks(); checkToolsInvoked(); checkSuite();
-  checkColdInstall(); checkConfigWired(); checkPlaybookRefs(); checkLeakScan();
+  checkColdInstall(); checkConfigWired(); checkPlaybookRefs(); checkLeakScan(); checkTargetTier();
 
   const w = Math.max(...rows.map(r => r.name.length));
   process.stdout.write('\n  PREFLIGHT — ' + path.basename(ROOT) + '\n');

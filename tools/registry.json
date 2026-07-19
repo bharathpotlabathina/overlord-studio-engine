@@ -154,6 +154,14 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 5.1 (M6) \u2014 verbatim dup detector, engine core vs vault overlay (reference-only rule). CURRENTLY RED BY DESIGN: 2 real pre-existing codex<->handbook dupes found on first run; clears when the staged codex landing (docs/superpowers/proposals/2026-07-19-five-laws-codex-landing.md, vault) is landed by the Director via the source-of-truth gate. Paraphrase drift = registered human-judgment check, not claimed covered."
+    },
+    {
+      "id": "law5-reconciliation",
+      "trigger": "tools/doctor.js",
+      "check": "tools/checks/law5-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 6.2 \u2014 the Law-5 hard gate. HONESTLY RED until (a) the Director rules which N_old baseline binds (live=12 vs declared=20 \u2014 parked since Phase 0) and (b) cutover closes the dispositions. A count tool that reports pass on an overage would fail its own purpose; this one blocks."
     }
   ],
   "documents": [

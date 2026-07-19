@@ -1,3 +1,10 @@
+> **KILLED — retired in place 2026-07-19 (Stage 3 Task 6.1).** This document
+> describes the compiled-wiki layer that went **Graveyard 2026-07-15** (killed on
+> three independent grounds: premise dissolved, dependency falsified, and it
+> builds the class of derived view that lies). No replacement exists because the
+> feature is dead, not migrated. Kept whole below — kills preserved, reasoning
+> kept, never scrubbed.
+
 # Wiki Entry Schema
 
 Per-document. One source doc → one wiki entry. Never merge multiple docs into one entry.

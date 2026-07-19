@@ -186,3 +186,19 @@ a superseding proof gets a new entry.
 **5.2 (I-82):** verified already-proven in the suite — autosync off=nothing, typo fails closed, commit=local-only, on=pushes, fresh scaffold defaults OFF; preflight asserts it cold.
 
 **5.3 (I-95):** Graveyard'd caps removed from the phase-progress denominator, shown as `(+N retired)` — fixed in BOTH the live Python validator and the engine JS port, new test red→green (46/46), and live-verified on the real map: phase-1 went from a lying `31/32` to `31/31 Live (+1 retired)`.
+
+---
+
+## Phase 6 — Retire-in-place, Law-5 reconciliation, parks (2026-07-19)
+
+**6.1 (retire only after replacement is green — honoured literally):**
+- `methodology/wiki-schema.md` → KILLED banner, retired in place (feature dead since 2026-07-15, no replacement needed; kills preserved, text kept whole).
+- Engine's dead local `.git/hooks/pre-push` (sweep W19) → deleted; the live shared pre-push is a strict superset and green.
+- Vault `/login` playbook → **condemned-in-place notice** (the Director's "the login has to go" + the sweep's death certificate) but STAYS FUNCTIONAL until the engine plugin cutover is live-green — nothing retires on faith; its engine replacement is test-green, not live-green.
+- Parked for the Director: `studio-vault` abandoned repo disposal · statusline wire (W12) · the stale `atlas@overlord-studio` plugin install.
+
+**6.2:** `tools/checks/law5-check.js` registered — prints N_new vs BOTH baselines under the one counting unit. Current truth: **N_new=19 · vs live-only N_old=12 FAIL · vs declared N_old=20 PASS** · disposition closure PENDING CUTOVER. The check **blocks (exit 1) until the Director rules which baseline binds** — park, never fudge. Doctor terminal state tonight: 19 mechanisms, **17 green + 2 designed reds** (core-overlay-dedup awaiting the codex landing; law5-reconciliation awaiting the baseline ruling + cutover).
+
+**6.3: PARKED by standing order** — no CLI upgrade mid-marathon; run at a session boundary, then the Workflows trial.
+
+**6.4: PARKED (the closing milestone needs sessions + the Director).** Next session's opening move: summon the Release Engineer, compose Sakori Release 1 from `p13-integration` per `release-compose.md` (first act, feeds G1 exit a). Part (b)'s fresh-account cold install + Windows substrate + vet reviewer all await his rulings (Q4/Q7).

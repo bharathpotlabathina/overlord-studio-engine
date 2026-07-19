@@ -80,6 +80,22 @@
       "lastVerified": "2026-07-19",
       "home": "V",
       "note": "Task 2.1 — HQ-side wire: weekly scheduled task 'weekly-memory-consolidation' (Sun 07:02 local) runs the consolidate-memory skill with the no-lossy-distillation + kills-preserved rules inline. TRIGGER FIELD IS NOMINAL (the real trigger is the scheduler, machine-side); firing proof pending the first scheduled run — see PROOFS.md. Free-tier note: consumes plan tokens weekly, flagged in HANDOFF."
+    },
+    {
+      "id": "brief-template-lint",
+      "trigger": "tools/template-lint.js",
+      "check": "tools/test/template-lint.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.4 — 4-part dispatch contract enforced on brief files; Rounds>3 blocks the launch AND auto-files a retro entry (M1 wire, idempotent by run-id)."
+    },
+    {
+      "id": "expand-contract-gate",
+      "trigger": "tools/pre-commit",
+      "check": "tools/test/expand-contract.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.5 — destructive migration op requires a prior additive migration on the same table; same-file additive does not count. Wired into the pre-commit composite (distinct trigger->check pair, recorded distinctly per the B2 counting rule)."
     }
   ],
   "documents": []

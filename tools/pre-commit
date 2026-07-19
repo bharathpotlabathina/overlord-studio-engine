@@ -94,6 +94,26 @@ if (secretOffenders.length) {
   }
 }
 
+// --- Expand/contract migration shape gate (Task 2.5) ---
+// Runs on every migrations dir that has a staged file. Working-tree scan: the
+// shape rule is corpus-wide (prior files matter), not per-staged-hunk.
+{
+  const dirs = new Set();
+  for (const f of acm) {
+    const parts = f.split('/');
+    const mi = parts.indexOf('migrations');
+    if (mi !== -1 && mi !== parts.length - 1 && parts[mi + 1] !== 'RESERVED') {
+      dirs.add(parts.slice(0, mi + 1).join('/'));
+    }
+  }
+  for (const dir of dirs) {
+    let code = 0;
+    try { execFileSync('node', [path.join(__dirname, 'expand-contract-check.js'), dir], { stdio: 'inherit' }); }
+    catch (e) { code = e.status || 1; }
+    if (code !== 0) fail('COMMIT BLOCKED — expand/contract violation (see above)');
+  }
+}
+
 // --- Atlas map validation ---
 const MAP_PATH = '_claude/studio-atlas-map.json';
 if (acm.includes(MAP_PATH)) {

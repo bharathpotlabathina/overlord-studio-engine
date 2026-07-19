@@ -134,3 +134,13 @@ a superseding proof gets a new entry.
 **Task 2.3:** `studio-session-init.js` rewritten pure-Node as the single SessionStart wire absorbing session-init + HANDOFF-staleness (handoff-age.sh) + retro-count nudges, with a heartbeat beacon written every run and `tools/checks/heartbeat-check.js` registered in the doctor (missing-beacon = explicit cold line while the plugin is uninstalled; stale beacon = blocking once any beacon exists). **Red→green:** 4 new tests (stale HANDOFF → nudge / fresh → silent / retro count / no-bash assertion); the Task 1.5 dated posix exception is now DEAD — exception list empty again, guard fully clean. The engine-side Sunday printed reminder was deleted with the rewrite (its replacement — the 2.1 cron — exists first; movers after detectors).
 
 **Doctor:** `checked 9, found 9 green · mechanism count: 9`. Suite 113/113.
+
+---
+
+## Tasks 2.4 + 2.5 — Dispatch-brief lint + retro-wire; expand/contract gate (2026-07-19)
+
+**Task 2.4:** `methodology/subagent-brief-template.md` rebuilt to the ratified 4-part contract (Objective / Output format / Tool guidance / Explicit boundaries) + hard 5-worker ceiling + decompose-by-owned-resource + the Non-Blocking Law Q/A/defaults section with `Rounds: N`. `tools/template-lint.js` enforces it. **Red→green:** 4/5 tests failing pre-implementation → 5/5. Acceptance: missing Explicit-boundaries → fail named; missing Rounds → fail; `Rounds: 4` fixture → **blocks the launch AND auto-files a retro entry** in the vault retro-log (M1 wire — append-only, idempotent by run-id, verified non-duplicating on a second run); no `--vault` → nothing files (red→green both ways).
+
+**Task 2.5:** `tools/expand-contract-check.js` — destructive op (DROP COLUMN/TABLE, RENAME) on table T requires a prior additive migration touching T; same-file additive does not count (the single-migration disease). Wired into the pre-commit composite on staged migration dirs. **Discipline note, honestly:** impl was written before the tests ran red (a TDD slip); the red half was then proven by mutation — neutering the DESTRUCTIVE pattern made the block-tests fail (gate goes silent = tests catch it), restore → 4/4. Acceptance: bare DROP COLUMN blocked; expand→contract split passes; DROP TABLE with/without prior CREATE both behave.
+
+**Doctor:** `checked 11, found 11 green · mechanism count: 11`. Suite 122/122.

@@ -1,131 +1,71 @@
-# Subagent Brief Template
+# Subagent Brief Template (dispatch contract)
 
-Subagents start cold — no session context, no memory, no prior work. Every brief must be self-contained.
-Use the block structure below. Omit blocks that don't apply. Never omit Context or Task.
+Subagents start cold — no session context, no memory, no prior work. Every brief is
+self-contained and carries the **4-part contract** below plus the pre-flight
+questions section. `template-lint.js` enforces the structure; a brief missing a
+required section does not dispatch.
 
----
+**Hard worker ceiling: 5 concurrent workers per dispatch wave.** More workers than
+that is a decomposition smell, not a throughput win.
 
-## Brief Structure
-
-### 1. Identity (2–3 lines)
-Who the agent is and what their judgment lens is. Sets the tone and filters what the agent pays attention to.
-
-> You are qa, QA engineer. You do not test to confirm things work — you test to find how they break.
-
-> You are a research agent. Your job is to find specific, verifiable facts — not summaries of general knowledge.
-
----
-
-### 2. Context (essential — never skip)
-What situation this agent is walking into. Include:
-- What the project/product is (one sentence)
-- What was just done or decided (what the agent needs to know to make good judgment calls)
-- Why this task matters right now
-
-Keep it tight. The agent needs enough to reason, not a full history.
+**Decompose by owned resource, not by problem type.** One file / repo / namespace /
+artifact = one owner. Two workers who can touch the same resource is how the
+four-branches-claiming-017 class of collision happens; the resource boundary IS the
+task boundary.
 
 ---
 
-### 3. Task (specific, not general)
-Exactly what to do. If there are multiple checks, list them explicitly.
+## Required sections (lint-enforced)
 
-Bad: "Review the SKILL.md changes."
-Good: "Check these 5 things in SKILL.md: (1) role list has exactly 3 identities per option, (2) vocabulary table has 3 columns matching role names exactly, (3)..."
+### ## Objective
+Who the agent is (one line of judgment lens), what situation it is walking into
+(2–4 lines: project, what was just done, why this matters now), and exactly what to
+do — specific checks listed explicitly, not "review X". For research: the literal
+search targets, not the topic.
 
-For research tasks — give the specific search targets, not the topic:
-Bad: "Research Graphify."
-Good: "Search for 'Graphify Claude Code skill', 'safishamsi graphify github', and 'Graphify knowledge graph'. Report: what it does, core mechanic, data model, and how it compares to Atlas [brief Atlas description]."
+### ## Output format
+Exactly what to return: structure (table / bullets / severity labels), length limit,
+and what "done" looks like. E.g. findings as **[BLOCKER]/[WARNING]/[MINOR]**, end
+with HOLD or CLEAR verdict; "under 300 words; if you can't find it, say so rather
+than guessing."
 
----
+### ## Tool guidance
+Exact paths to read (never make the agent guess), which tools to use or avoid,
+model expectations if relevant. Read-only vs write authority stated explicitly.
 
-### 4. Files / Resources (if applicable)
-Exact paths to read. Don't make the agent guess.
+### ## Explicit boundaries
+What the agent must NOT do. Prevents the common failure modes: "report only, do not
+fix" · "do not guess — a source you can't find is reported as not found" · "never
+claim repo state from memory — verify against files" · "touch only the files named
+above."
 
-> Read: `{{VAULT}}/<path>/SKILL.md`
-> Read lines 88–100 only of: `{{VAULT}}/<path>/template.html`
+### ## Questions / answers / defaults
+The Non-Blocking Law's pre-flight record. The dispatcher runs the iterated
+interrogation loop BEFORE launch: analyze → surface every question (important AND
+trivial) → collect rulings + authorized defaults → re-analyze with answers folded
+in → repeat to the zero-new-questions fixed point. This section records the final
+Q/A/default list and the round count:
 
----
-
-### 5. Output Format (always specify)
-Tell the agent exactly what to return. Include:
-- Structure (table, bullets, prose, severity labels)
-- Length limit if relevant
-- What a "done" response looks like
-
-> Report findings as **[BLOCKER]**, **[WARNING]**, or **[MINOR]**. End with a ship verdict: HOLD or CLEAR TO TEST.
-
-> Under 300 words. If you can't find it, say so clearly rather than guessing.
-
-> Return: what it is, core mechanic, key design decisions, comparison to Atlas. Under 400 words.
-
----
-
-### 6. Constraints (optional but useful for QA and research)
-What the agent should NOT do. Prevents common failure modes.
-
-- "Do not summarise what you checked — only report what you found wrong."
-- "Do not guess. If a source is not findable, say so."
-- "Do not fix — report only. Stay in your lane."
-- "Do not make claims about repo state from memory — verify against files."
-
----
-
-## Quick Templates by Type
-
-### QA / qa
 ```
-You are qa, QA engineer. Find what breaks — not what works.
-
-**Context:** [What was built, what changed, why it matters now]
-
-**Review:**
-- [Specific thing 1 — include exact strings/paths to check]
-- [Specific thing 2]
-- [Cross-check: does X in file A match Y in file B]
-
-**Files:** [Exact paths]
-
-**Output:** List findings as [BLOCKER] / [WARNING] / [MINOR]. PASS if nothing found.
-End with verdict: HOLD or CLEAR TO TEST.
-Do not summarise what you checked — only report findings.
+Rounds: N
+Q: <question>  A: <ruling or authorized default>
+...
 ```
 
-### Research
-```
-Research [topic] in the context of [why it matters to us].
-
-Search for: [specific queries, not just the topic name]
-
-Report:
-1. What is it / what does it do?
-2. Core mechanic
-3. [Specific comparison or angle relevant to our work]
-4. What we can absorb
-
-Under [N] words. If you can't find it, say so rather than guessing.
-Sources: include links.
-```
-
-### Build / dev-web subagent
-```
-You are dev-web, full-stack web developer. Build to production, not demo.
-
-**Context:** [Project, stack, what exists, what needs to exist]
-
-**Task:** [Specific feature/fix — not "implement X" but "add Y to file Z so that W happens"]
-
-**Spec:**
-- [Requirement 1]
-- [Requirement 2 with edge cases]
-
-**Files to read first:** [Exact paths — the agent must read these before writing anything]
-
-**Done looks like:** [Testable success criteria — not "it works" but "calling X returns Y"]
-
-**Do not:** [Scope limits — what's out of bounds for this task]
-```
+An unasked question at launch is a prep failure. **`Rounds:` > 3 is the standing
+performance benchmark tripwire** — the lint auto-files a retro-log entry naming the
+scoping failure (the run was under-scoped: split it, don't launch it).
 
 ---
 
-*Maintained by orchestrator. Updated 2026-06-21.*
-*Lives at `_claude/subagent-brief-template.md`. Reference before spawning any subagent.*
+## Quick patterns
+
+**QA:** objective = "find what breaks, not what works"; boundaries = "do not
+summarise what you checked — only report findings."
+
+**Research:** objective carries the literal queries; output = numbered findings +
+sources; boundaries = "no guessing; absence is a finding."
+
+**Build:** objective = feature spec with edge cases ("add Y to file Z so that W");
+tool guidance = exact files + test command; boundaries = "one writer per file;
+tests must pass before reporting DONE."

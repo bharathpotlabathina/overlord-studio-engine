@@ -1,6 +1,6 @@
 # Overlord Studio Engine
 
-v0.1.2 · by Bharath Potlabathina
+v0.1.3 · by Bharath Potlabathina
 
 A structured **studio engine** for Claude Code: a team of role-based personas, a shared methodology (planning → build → QA → verification), and the machinery to skin them to a theme of your choosing — all wired to **your own vault** of memory, projects, and context.
 

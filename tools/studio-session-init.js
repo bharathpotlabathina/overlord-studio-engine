@@ -29,6 +29,28 @@ function main() {
 
   heartbeat(VAULT);
 
+  // Doctor gauge — EVERY session open, before the once-a-day gate: health is a
+  // gauge, not a nudge, and a session that opens blind to a red is how the
+  // target-tier battery's flow B failed (2026-07-19: a diligent cold operator
+  // committed on an unhealthy machine because nothing told it to check).
+  // Loud on red, loud on crash — the one forbidden outcome is silence.
+  // Re-entrancy: when the doctor itself is running this flow as a check
+  // (STUDIO_DOCTOR set), skip the gauge — doctor→check→doctor is a fork bomb.
+  if (!process.env.STUDIO_DOCTOR) try {
+    const { runDoctor } = require('./doctor.js');
+    const { ok, lines } = runDoctor(path.resolve(__dirname, '..'));
+    if (ok) {
+      const n = (lines.join('\n').match(/checked (\d+)/) || [])[1] || '?';
+      console.log(`🩺 doctor: ${n} mechanisms green`);
+    } else {
+      console.log('🩺 DOCTOR RED — the machine is NOT healthy:');
+      lines.forEach((l) => console.log('   ' + l));
+      console.log('   Do not proceed with studio work until this is resolved or the Director rules.');
+    }
+  } catch (e) {
+    console.log('🩺 DOCTOR CRASHED — treat as RED: ' + (e.message || e).toString().slice(0, 120));
+  }
+
   const flag = tmpFlag(`studio-session-init-${dateStamp()}`);
   if (fs.existsSync(flag)) return;
 
@@ -68,7 +90,7 @@ function main() {
   // Unintegrated-retro nudge (absorbed from retro-count.sh).
   const retroLog = path.join(VAULT, '_claude', 'retros', 'retro-log.md');
   if (fs.existsSync(retroLog)) {
-    const open = fs.readFileSync(retroLog, 'utf8').split('\n').filter((l) => /^- \[ \]/.test(l)).length;
+    const open = fs.readFileSync(retroLog, 'utf8').split('\n').filter((l) => /^- Status: unintegrated/.test(l)).length;
     if (open > 0) console.log(`📋 ${open} unintegrated retro entr${open === 1 ? 'y' : 'ies'} — /retro-integrate when convenient.`);
   }
 

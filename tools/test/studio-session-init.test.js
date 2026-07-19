@@ -50,11 +50,25 @@ test('stale HANDOFF (>3 days) -> nudge; fresh -> silent', () => {
   assert.doesNotMatch(run(v, tmp2).out, /days old/);
 });
 
-test('open retro entries -> counted nudge; none -> silent', () => {
+test('open retro entries -> counted nudge (real retro-log format); none -> silent', () => {
   const { v, tmp } = newVault();
+  // The real retro-log format is "- Status: unintegrated" (vault retro-log.md);
+  // this test's first version invented a checkbox format and codified the bug.
   fs.writeFileSync(path.join(v, '_claude', 'retros', 'retro-log.md'),
-    '- [ ] one\n- [x] done\n- [ ] two\n');
+    '- Learning: one\n- Status: unintegrated\n- Learning: two\n- Status: integrated\n- Learning: three\n- Status: unintegrated\n');
   assert.match(run(v, tmp).out, /2 unintegrated retro entries/);
+});
+
+// Skipped when this file is itself running as a doctor check (STUDIO_DOCTOR set):
+// inside that subtree the gauge is suppressed BY DESIGN (re-entrancy guard), so
+// asserting its presence there would fail the very mechanism it protects.
+test('doctor health line printed on every session open (battery flow-B wire)',
+  { skip: !!process.env.STUDIO_DOCTOR }, () => {
+  const { v, tmp } = newVault();
+  const { out } = run(v, tmp);
+  // Green engine -> one-line gauge. The red path ("DOCTOR RED") rides the same
+  // wire; red-state detection itself is covered by doctor.test.js.
+  assert.match(out, /🩺 doctor: \d+ mechanisms green/);
 });
 
 test('no bash spawn remains (the Task 1.5 dated exception dies here)', () => {

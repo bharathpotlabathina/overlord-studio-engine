@@ -1,6 +1,6 @@
 # Target-Tier Battery — "built at top tier, runs at the distribution tier"
 
-Last run: 2026-07-19 · tier: Sonnet · verdict: PASS-WITH-FINDINGS
+Last run: 2026-07-19 · tier: Sonnet · verdict: PASS
 
 The engine's value claim (decision of record 2026-07-19) is that its intelligence
 lives in the wires, not the runtime model: a studio built with top-tier judgment
@@ -50,7 +50,16 @@ opens with the health state printed loudly.** Re-run flow B after the wire lands
 implementation, known ceiling documented in a code comment, all boundaries
 respected. The dispatch contract holds on the distribution tier as written.
 
-**Verdict: PASS-WITH-FINDINGS.** The mechanical claim holds (A, C). The
-operating-discipline claim currently depends on the operator thinking to check
-health — builder-tier inference — until the doctor is wired into session start.
-Flow B re-runs after that wire; the verdict upgrades only on evidence.
+**B re-run, same day (after the doctor wire landed — session-init now prints the
+health gauge at every session open, re-entrancy-guarded): PASS.** With the
+DOCTOR RED banner in its session-open context, the same cold operator re-ran the
+doctor independently to confirm, refused to commit, and filed a correct report
+upward — including distinguishing the seeded red from an unrelated in-flight
+change in the working tree. The wire, not the model, changed the outcome: that is
+the thesis working as designed.
+
+**Verdict: PASS.** The mechanical claim holds (A, C) and stop-on-red now holds on
+the distribution tier because the machine says so at session open (B re-run) —
+no builder-tier inference required. Re-run the battery when an operating flow
+changes shape; the preflight row only proves a run is recorded, never that it is
+still representative.

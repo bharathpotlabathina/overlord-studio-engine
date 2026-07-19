@@ -55,7 +55,10 @@ function runDoctor(root) {
     }
     const checkAbs = path.join(root, m.check);
     try {
-      execFileSync('node', [checkAbs], { cwd: root, encoding: 'utf8' });
+      // STUDIO_DOCTOR marks the whole check subtree: any flow that would call
+      // the doctor again (e.g. session-init's health gauge) no-ops instead of
+      // recursing — doctor→check→doctor is a fork bomb otherwise.
+      execFileSync('node', [checkAbs], { cwd: root, encoding: 'utf8', env: { ...process.env, STUDIO_DOCTOR: '1' } });
       greenCount += 1;
     } catch (e) {
       ok = false;

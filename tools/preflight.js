@@ -155,6 +155,16 @@ function checkConfigWired() {
     dead.length ? `WRITE-ONLY: ${dead.join(', ')}` : `${keys.join(', ')} — all read`);
 }
 
+// 5b. FLAGS LEDGER — no open flags at push time. Added 2026-07-20 (postmortem:
+//     the 2026-07-19 reality sweep flagged studio-pipeline.md "migrate-with-
+//     rewrite"; the flag had no carrier and three versions shipped stale docs).
+//     A sweep/absorption flag lands as an OPEN line in FLAGS.md; only a
+//     RESOLVED or Director-WAIVED line clears it.
+function checkFlags() {
+  try { const out = sh('node', [path.join(ROOT, 'tools/checks/flags-check.js')]); return record('flags ledger → no open flags', true, out.trim()); }
+  catch (e) { return record('flags ledger → no open flags', false, ((e.stdout || '') + (e.stderr || '')).trim().split('\n').slice(0, 2).join(' ')); }
+}
+
 // 6. Leak scan, if the vault's scanner is reachable. Distribution repos must not
 //    carry private names, personas, or local-rig jargon.
 function checkLeakScan() {
@@ -217,7 +227,7 @@ function checkTargetTier() {
 
 function main() {
   checkHooks(); checkToolsInvoked(); checkSuite();
-  checkColdInstall(); checkConfigWired(); checkPlaybookRefs(); checkLeakScan(); checkTargetTier();
+  checkColdInstall(); checkConfigWired(); checkFlags(); checkPlaybookRefs(); checkLeakScan(); checkTargetTier();
 
   const w = Math.max(...rows.map(r => r.name.length));
   process.stdout.write('\n  PREFLIGHT — ' + path.basename(ROOT) + '\n');

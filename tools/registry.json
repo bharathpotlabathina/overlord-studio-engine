@@ -66,7 +66,7 @@
       "check": "tools/test/studio-session-init.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.3 \u2014 one SessionStart wire absorbing the old studio's three UserPromptSubmit scripts: pull + Node self-heal + sot read-only + HANDOFF-staleness nudge + retro nudge + heartbeat. Pure Node (bash exception retired same day). Replaces wires W01+W02+W03 at cutover (3 -> 1)."
+      "note": "Task 2.3 \u2014 one SessionStart wire absorbing the old studio's three UserPromptSubmit scripts: pull + Node self-heal + sot read-only + HANDOFF-staleness nudge + retro nudge + heartbeat + doctor health gauge (EVERY open, before the daily gate; loud on red; re-entrancy-guarded via reserved STUDIO_DOCTOR \u2014 added 2026-07-19, target-tier battery flow-B fix). Pure Node (bash exception retired same day). Replaces wires W01+W02+W03 at cutover (3 -> 1)."
     },
     {
       "id": "heartbeat-recency",

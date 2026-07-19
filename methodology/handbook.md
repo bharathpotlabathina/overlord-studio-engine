@@ -6,6 +6,22 @@ Roles load this file up to (but not including) the `## Role Doctrine` section fo
 
 ---
 
+## The Thesis — the studio's centerpiece (ratified 2026-07-19)
+
+**Built at the top tier to run at the standard tier.** The studio is designed,
+written, and certified with the deepest minds available — so that it operates,
+day to day, on inexpensive standard-tier models without losing its discipline.
+The intelligence lives in the writing and the wiring: watertight role kernels,
+explicit routing and seams, gates that go red, runbooks a cold agent can
+execute from the page alone. A rule that requires a top-tier mind to interpret
+is a defect, the same class as code that only runs on the author's machine.
+Escalation to deeper models happens per-dispatch, downward into subagents,
+only when a task genuinely demands it — and the dispatcher names why. Every
+mechanism and kernel is certified by a cold standard-tier run before it ships;
+nothing relies on intelligence the runtime doesn't have.
+
+The Five Laws below all serve this thesis.
+
 ## The Five Laws (ratified 2026-07-19)
 
 1. **Native first.** Compose the platform's own features (hooks, skills, subagents, schedulers) before building parallel machinery. Hand-rolls that duplicate native features are debt.

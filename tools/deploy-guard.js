@@ -6,10 +6,10 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { readStdin } = require('./platform.js');
+const { readStdin, resolveVault } = require('./platform.js');
 
 async function main() {
-  const VAULT = process.argv[2] || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
+  const VAULT = resolveVault(process.argv[2]) || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
   const input = await readStdin();
 
   let cmd = '';

@@ -58,3 +58,31 @@ test('date stamps match expected shapes', () => {
   assert.match(P.isoStamp(), /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/);
   assert.match(P.localHM(), /^\d{2}:\d{2}$/);
 });
+
+test('resolveVault: valid arg wins', () => {
+  const d = tmp();
+  assert.strictEqual(P.resolveVault(d, '/nonexistent-settings'), d);
+});
+
+test('resolveVault: unsubstituted ${...} literal falls through to env', () => {
+  const d = tmp();
+  process.env.CLAUDE_PLUGIN_OPTION_VAULT_PATH = d;
+  try {
+    assert.strictEqual(P.resolveVault('${CLAUDE_PLUGIN_OPTION_VAULT_PATH}', '/nonexistent-settings'), d);
+  } finally { delete process.env.CLAUDE_PLUGIN_OPTION_VAULT_PATH; }
+});
+
+test('resolveVault: falls back to settings pluginConfigs under any marketplace-suffixed id', () => {
+  const d = tmp();
+  const vault = path.join(d, 'vault'); fs.mkdirSync(vault);
+  const settings = path.join(d, 'settings.json');
+  // desktop sideloads plugins as <name>@inline — options must resolve regardless of suffix
+  fs.writeFileSync(settings, JSON.stringify({
+    pluginConfigs: { 'overlord-studio-engine@inline': { options: { vault_path: vault } } },
+  }));
+  assert.strictEqual(P.resolveVault(undefined, settings), vault);
+});
+
+test('resolveVault: nothing found -> null', () => {
+  assert.strictEqual(P.resolveVault('/no/such/dir', '/nonexistent-settings'), null);
+});

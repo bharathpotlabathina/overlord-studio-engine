@@ -12,6 +12,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const { resolveVault } = require('./platform.js');
 
 const NON_NEGOTIABLE = ['verification-before-completion'];
 const ADVISORY = ['brainstorming', 'systematic-debugging'];
@@ -60,7 +61,7 @@ function audit(vault) {
 }
 
 if (require.main === module) {
-  const vault = process.argv[2];
+  const vault = resolveVault(process.argv[2]);
   if (!vault) { console.log('usage: skill-audit.js <vault-path>'); process.exit(2); }
   const { code, lines } = audit(vault);
   console.log(lines.join('\n'));

@@ -4,11 +4,11 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { readStdin, isoStamp } = require('./platform.js');
+const { readStdin, isoStamp, resolveVault } = require('./platform.js');
 
 async function main() {
   try {
-    const VAULT = process.argv[2];
+    const VAULT = resolveVault(process.argv[2]);
     if (!VAULT) return;
     const input = await readStdin();
     let skill = '?';

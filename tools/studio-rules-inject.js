@@ -7,7 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const { ops } = require('./flavour.js');
 
-const VAULT = process.env.CLAUDE_PLUGIN_OPTION_VAULT_PATH || '';
+const { resolveVault } = require('./platform.js');
+const VAULT = resolveVault(process.argv[2]) || '';
 const PLUGIN = process.env.CLAUDE_PLUGIN_ROOT || path.resolve(__dirname, '..');
 
 const RULES = `# Studio Context

@@ -86,7 +86,35 @@ function isoWeek(d = new Date()) {
   return Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
 }
 
+// Resolve the vault path for hook entry scripts. Harnesses disagree on what the
+// hook receives: the CLI substitutes ${...} args and exports CLAUDE_PLUGIN_OPTION_*
+// env vars, but the desktop app sideloads installed plugins as "<name>@inline" and
+// looks pluginConfigs up under that id — so options stored under the marketplace id
+// never reach the arg OR the env (observed on 2.1.215, 2026-07-19). Order:
+// arg (ignoring unsubstituted '${...}' literals) → env → settings.json pluginConfigs
+// under the plugin's name with ANY marketplace suffix → null (callers fail soft).
+function resolveVault(arg, settingsFile) {
+  const isDir = (p) => { try { return fs.statSync(p).isDirectory(); } catch { return false; } };
+  if (arg && !arg.startsWith('${') && isDir(arg)) return arg;
+  const env = process.env.CLAUDE_PLUGIN_OPTION_VAULT_PATH;
+  if (env && isDir(env)) return env;
+  try {
+    let name = 'overlord-studio-engine';
+    try {
+      name = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '.claude-plugin', 'plugin.json'), 'utf8')).name || name;
+    } catch { /* renamed fork without a manifest keeps the default */ }
+    const file = settingsFile || path.join(os.homedir(), '.claude', 'settings.json');
+    const cfgs = JSON.parse(fs.readFileSync(file, 'utf8')).pluginConfigs || {};
+    for (const [k, v] of Object.entries(cfgs)) {
+      if (k !== name && !k.startsWith(name + '@')) continue;
+      const p = v && v.options && v.options.vault_path;
+      if (p && isDir(p)) return p;
+    }
+  } catch { /* no settings readable — fall through */ }
+  return null;
+}
+
 module.exports = {
   isWin, linkDir, makeReadOnly, makeWritable, isWritable,
-  walk, tmpFlag, readStdin, dateStamp, isoStamp, localHM, isoWeek,
+  walk, tmpFlag, readStdin, dateStamp, isoStamp, localHM, isoWeek, resolveVault,
 };

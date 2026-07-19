@@ -9,14 +9,14 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { dateStamp } = require('./platform.js');
+const { dateStamp, resolveVault } = require('./platform.js');
 
 function git(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8' });
 }
 
 function main() {
-  const VAULT = process.argv[2] || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
+  const VAULT = resolveVault(process.argv[2]) || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
   const LOG = path.join(VAULT, '_claude', 'session-log.md');
   try {
     // Whole-repo dirty check. --porcelain lists untracked (??) by default.

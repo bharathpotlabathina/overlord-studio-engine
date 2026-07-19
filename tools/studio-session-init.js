@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { tmpFlag, walk, isWritable, dateStamp, localHM } = require('./platform.js');
+const { tmpFlag, walk, isWritable, dateStamp, localHM, resolveVault } = require('./platform.js');
 
 const HANDOFF_STALE_DAYS = 3;
 
@@ -24,7 +24,7 @@ function heartbeat(vault) {
 }
 
 function main() {
-  const VAULT = process.argv[2] || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
+  const VAULT = resolveVault(process.argv[2]) || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
   if (!fs.existsSync(VAULT)) { process.stderr.write(`vault path not found: ${VAULT}\n`); process.exit(1); }
 
   heartbeat(VAULT);

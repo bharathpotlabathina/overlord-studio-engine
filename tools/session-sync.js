@@ -18,6 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { resolveVault } = require('./platform.js');
 
 function git(cwd, args) {
   return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -41,7 +42,7 @@ function config(vault, key) {
 }
 
 function main() {
-  const VAULT = process.argv[2];
+  const VAULT = resolveVault(process.argv[2]);
   if (!VAULT) { process.stderr.write('vault_path invalid — skipping auto-sync\n'); return; }
   try { git(VAULT, ['rev-parse', '--git-dir']); }
   catch { process.stderr.write('vault_path invalid — skipping auto-sync\n'); return; }

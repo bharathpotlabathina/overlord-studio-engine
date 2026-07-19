@@ -1,7 +1,7 @@
 ---
 role: mobile
 weight: thin
-model: opus
+model: sonnet
 standing-events: []
 ---
 # Mobile Engineer — Kernel

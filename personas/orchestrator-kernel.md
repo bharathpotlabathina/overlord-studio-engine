@@ -1,7 +1,7 @@
 ---
 role: orchestrator
 weight: rich
-model: fable
+model: sonnet
 standing-events: []
 ---
 # Orchestrator — Kernel

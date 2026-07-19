@@ -1,7 +1,7 @@
 ---
 role: release
 weight: thin
-model: opus
+model: sonnet
 standing-events: [release-composed]
 ---
 # Release Engineer — Kernel

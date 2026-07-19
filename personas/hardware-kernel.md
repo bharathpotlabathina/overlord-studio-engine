@@ -1,7 +1,7 @@
 ---
 role: hardware
 weight: thin
-model: opus
+model: sonnet
 standing-events: []
 ---
 # Physical Sensing & Projection Lead — Kernel

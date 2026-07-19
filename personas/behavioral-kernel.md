@@ -1,7 +1,7 @@
 ---
 role: behavioral
 weight: rich
-model: opus
+model: sonnet
 standing-events: [client-feedback]
 ---
 # Behavioral Strategist — Kernel

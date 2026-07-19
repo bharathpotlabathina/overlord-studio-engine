@@ -1,7 +1,7 @@
 ---
 role: dev-web
 weight: thin
-model: opus
+model: sonnet
 standing-events: [feature-build-starts]
 ---
 # Full-Stack Web Developer — Kernel

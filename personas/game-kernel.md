@@ -1,7 +1,7 @@
 ---
 role: game
 weight: thin
-model: opus
+model: sonnet
 standing-events: []
 ---
 # Game Build Lead — Kernel

@@ -5,9 +5,11 @@
     "N_old_live": 12,
     "N_old_declared": 20,
     "projected_N_new": "17-21",
-    "finding": "projection shows N_new >= N_old under the live-only baseline; which baseline binds (live=12 vs declared=20) is PARKED for the Director — surfaced at Phase 0 per plan Task 0.2a, not deferred to Phase 6"
+    "finding": "projection shows N_new >= N_old under the live-only baseline; which baseline binds (live=12 vs declared=20) is PARKED for the Director \u2014 surfaced at Phase 0 per plan Task 0.2a, not deferred to Phase 6"
   },
-  "wiringRoots": ["hooks"],
+  "wiringRoots": [
+    "hooks"
+  ],
   "mechanisms": [
     {
       "id": "registry-doctor",
@@ -15,7 +17,7 @@
       "check": "tools/checks/registry-schema-check.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "bootstrap entry — the registry+doctor pair registers itself. Full seed from the old studio happens at Task 0.2a (reality sweep); nothing else migrates before then."
+      "note": "bootstrap entry \u2014 the registry+doctor pair registers itself. Full seed from the old studio happens at Task 0.2a (reality sweep); nothing else migrates before then."
     },
     {
       "id": "migration-number-gate",
@@ -23,7 +25,7 @@
       "check": "tools/test/migration-guard.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.1 — duplicate-migration-number pre-commit gate + claim ledger (atomic mkdirSync, no flock). Ships to client repos."
+      "note": "Task 1.1 \u2014 duplicate-migration-number pre-commit gate + claim ledger (atomic mkdirSync, no flock). Ships to client repos."
     },
     {
       "id": "reservation-race-check",
@@ -31,7 +33,7 @@
       "check": "tools/test/reservation-race.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.2 — concurrent-claim atomicity self-check (Check B): 8 claimers, distinct sequential numbers."
+      "note": "Task 1.2 \u2014 concurrent-claim atomicity self-check (Check B): 8 claimers, distinct sequential numbers."
     },
     {
       "id": "infra-check",
@@ -39,7 +41,7 @@
       "check": "tools/test/infra-check.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.3 — live-state invariant boundary patrol (airgap-grade prod rule): env/RLS/dupes/pgpass/MCP/vercel groups, M4 tool-default vectors, m6 cold-install N/A. Wired: SessionStart (hooks.json) + tools/pre-push. This entry also claims hooks/hooks.json under the wiring root (doctor orphan resolved by an actual mechanism, not a bookkeeping row)."
+      "note": "Task 1.3 \u2014 live-state invariant boundary patrol (airgap-grade prod rule): env/RLS/dupes/pgpass/MCP/vercel groups, M4 tool-default vectors, m6 cold-install N/A. Wired: SessionStart (hooks.json) + tools/pre-push. This entry also claims hooks/hooks.json under the wiring root (doctor orphan resolved by an actual mechanism, not a bookkeeping row)."
     },
     {
       "id": "skill-firing-audit",
@@ -47,7 +49,7 @@
       "check": "tools/test/skill-audit.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.4 — Stop-hook skill audit (log-skill.js writes, skill-audit.js flags non-negotiable absence at session close). Report-only by dated exception (2026-07-14 WARN precedent). Fixes I-97: hook-wired (not /logout honor-system), and (none)/absence are loud flags."
+      "note": "Task 1.4 \u2014 Stop-hook skill audit (log-skill.js writes, skill-audit.js flags non-negotiable absence at session close). Report-only by dated exception (2026-07-14 WARN precedent). Fixes I-97: hook-wired (not /logout honor-system), and (none)/absence are loud flags."
     },
     {
       "id": "posix-only-guard",
@@ -55,7 +57,7 @@
       "check": "tools/checks/posix-only-check.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.5 / B1 recurrence guard — call-shaped grep for POSIX-only primitives (flock, shell spawns, shell shebangs) across tools/. Exception list empty again since Task 2.3 killed the legacy bash call. Windows RUN parked (Q7 substrate); smoke prepared as test/run-smoke.js."
+      "note": "Task 1.5 / B1 recurrence guard \u2014 call-shaped grep for POSIX-only primitives (flock, shell spawns, shell shebangs) across tools/. Exception list empty again since Task 2.3 killed the legacy bash call. Windows RUN parked (Q7 substrate); smoke prepared as test/run-smoke.js."
     },
     {
       "id": "session-start-consolidation",
@@ -63,7 +65,7 @@
       "check": "tools/test/studio-session-init.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.3 — one SessionStart wire absorbing the old studio's three UserPromptSubmit scripts: pull + Node self-heal + sot read-only + HANDOFF-staleness nudge + retro nudge + heartbeat. Pure Node (bash exception retired same day). Replaces wires W01+W02+W03 at cutover (3 -> 1)."
+      "note": "Task 2.3 \u2014 one SessionStart wire absorbing the old studio's three UserPromptSubmit scripts: pull + Node self-heal + sot read-only + HANDOFF-staleness nudge + retro nudge + heartbeat. Pure Node (bash exception retired same day). Replaces wires W01+W02+W03 at cutover (3 -> 1)."
     },
     {
       "id": "heartbeat-recency",
@@ -71,7 +73,7 @@
       "check": "tools/checks/heartbeat-check.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.3 — dead hooks caught by missing/stale beacons. Cold-tolerant by stated fact (plugin uninstalled = explicit cold line), blocking once beacons exist."
+      "note": "Task 2.3 \u2014 dead hooks caught by missing/stale beacons. Cold-tolerant by stated fact (plugin uninstalled = explicit cold line), blocking once beacons exist."
     },
     {
       "id": "memory-consolidation-cron",
@@ -79,7 +81,7 @@
       "check": "tools/test/skill-audit.test.js",
       "lastVerified": "2026-07-19",
       "home": "V",
-      "note": "Task 2.1 — HQ-side wire: weekly scheduled task 'weekly-memory-consolidation' (Sun 07:02 local) runs the consolidate-memory skill with the no-lossy-distillation + kills-preserved rules inline. TRIGGER FIELD IS NOMINAL (the real trigger is the scheduler, machine-side); firing proof pending the first scheduled run — see PROOFS.md. Free-tier note: consumes plan tokens weekly, flagged in HANDOFF."
+      "note": "Task 2.1 \u2014 HQ-side wire: weekly scheduled task 'weekly-memory-consolidation' (Sun 07:02 local) runs the consolidate-memory skill with the no-lossy-distillation + kills-preserved rules inline. TRIGGER FIELD IS NOMINAL (the real trigger is the scheduler, machine-side); firing proof pending the first scheduled run \u2014 see PROOFS.md. Free-tier note: consumes plan tokens weekly, flagged in HANDOFF."
     },
     {
       "id": "brief-template-lint",
@@ -87,7 +89,7 @@
       "check": "tools/test/template-lint.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.4 — 4-part dispatch contract enforced on brief files; Rounds>3 blocks the launch AND auto-files a retro entry (M1 wire, idempotent by run-id)."
+      "note": "Task 2.4 \u2014 4-part dispatch contract enforced on brief files; Rounds>3 blocks the launch AND auto-files a retro entry (M1 wire, idempotent by run-id)."
     },
     {
       "id": "expand-contract-gate",
@@ -95,7 +97,7 @@
       "check": "tools/test/expand-contract.test.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.5 — destructive migration op requires a prior additive migration on the same table; same-file additive does not count. Wired into the pre-commit composite (distinct trigger->check pair, recorded distinctly per the B2 counting rule)."
+      "note": "Task 2.5 \u2014 destructive migration op requires a prior additive migration on the same table; same-file additive does not count. Wired into the pre-commit composite (distinct trigger->check pair, recorded distinctly per the B2 counting rule)."
     },
     {
       "id": "schema-conformance",
@@ -103,7 +105,7 @@
       "check": "tools/checks/schema-conformance-check.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.6 — consumer docs declare contract-field lines; divergent names fail. Mutation-proven (objects.position rejected)."
+      "note": "Task 2.6 \u2014 consumer docs declare contract-field lines; divergent names fail. Mutation-proven (objects.position rejected)."
     },
     {
       "id": "postmortem-flag",
@@ -111,13 +113,42 @@
       "check": "tools/checks/postmortem-lint.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 2.7 — session-close (Stop) postmortem lint: format enforced, Status:open flagged loudly. Incident texts live V-side (_claude/postmortems/); 017-collision + prod-DB near-miss filed retroactively as the format seed."
+      "note": "Task 2.7 \u2014 session-close (Stop) postmortem lint: format enforced, Status:open flagged loudly. Incident texts live V-side (_claude/postmortems/); 017-collision + prod-DB near-miss filed retroactively as the format seed."
+    },
+    {
+      "id": "kernel-lint",
+      "trigger": "tools/kernel-lint.js",
+      "check": "tools/test/kernel-lint.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 3.0 \u2014 kernel structural conformance to personas/KERNEL-CONTRACT.md: frontmatter, required sections, thin/rich rules, live runbook links, standing-events wired, no codenames."
     }
   ],
   "documents": [
-    { "id": "subagent-brief-template", "path": "methodology/subagent-brief-template.md", "note": "dispatch contract (Task 2.4) — document, exempt from the Law-5 count" },
-    { "id": "interaction-platform", "path": "methodology/interaction-platform.md", "note": "milestones + cut lists + contract consumers (Task 2.6) — document" },
-    { "id": "postmortem-format", "path": "methodology/postmortem-format.md", "note": "postmortem format seed (Task 2.7) — document" },
-    { "id": "state-contract-schema", "path": "schemas/state-contract.json", "note": "shared tracked-state schema v1 (Task 2.6) — document/schema; its conformance CHECK is the counted wire" }
+    {
+      "id": "subagent-brief-template",
+      "path": "methodology/subagent-brief-template.md",
+      "note": "dispatch contract (Task 2.4) \u2014 document, exempt from the Law-5 count"
+    },
+    {
+      "id": "interaction-platform",
+      "path": "methodology/interaction-platform.md",
+      "note": "milestones + cut lists + contract consumers (Task 2.6) \u2014 document"
+    },
+    {
+      "id": "postmortem-format",
+      "path": "methodology/postmortem-format.md",
+      "note": "postmortem format seed (Task 2.7) \u2014 document"
+    },
+    {
+      "id": "state-contract-schema",
+      "path": "schemas/state-contract.json",
+      "note": "shared tracked-state schema v1 (Task 2.6) \u2014 document/schema; its conformance CHECK is the counted wire"
+    },
+    {
+      "id": "kernel-contract",
+      "path": "personas/KERNEL-CONTRACT.md",
+      "note": "the kernel spec (Task 3.0) \u2014 document"
+    }
   ]
 }

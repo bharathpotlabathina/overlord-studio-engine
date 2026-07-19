@@ -124,3 +124,5 @@ A known issue with no named owner and no resolution session does not exist. Do n
 | hardware | Platform, firmware, device infrastructure | `/summon-hardware` |
 | mobile | Mobile apps (Android + iOS), cross-platform-first | `/summon-mobile` |
 | behavioral | Behavioral / advisory review | `/summon-behavioral` |
+| release | Release engineering — environments, release composition; gates production only | `/summon-release` |
+| security | Security engineering — security-as-outcome; certificates feed every go/no-go | `/summon-security` |

@@ -35,7 +35,7 @@ layer comes from the Design Director.
 platform* is the firmware/OS/driver layer on a physical unit — that layer is
 yours. Application software running atop it belongs to its build seat (a
 cabinet's game is the Game role's; an operator app is the Mobile role's).
-Studio back-office machines — e.g. the local-model (grunt) box — are the
+Studio back-office machines — e.g. the local-model box — are the
 Release Engineer's environments, **not** yours.
 
 **The physical rig lifecycle is yours end to end:** procurement (you spec and

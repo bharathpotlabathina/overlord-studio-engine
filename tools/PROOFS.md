@@ -168,3 +168,11 @@ a superseding proof gets a new entry.
 **Task 3.3 — Local-auth gate (V-side), built to completion-minus-the-human-step.** The sweep proved NO prior artifact existed despite the dry-run claim — built from zero: `setup/local-auth-gate.swift` (Tier 1 deviceOwnerAuthentication, 120s timeout fail-closed, exit-code-only contract) + `setup/local-auth-gate-selftest.sh` (3 checks PASS: parses, fail-closed convention, playbook wiring) + the source-of-truth gate playbook step 1b (any non-zero = stop, never retry-loop). **LIVE dialog red→green (cancel=1, authenticate=0) AWAITS OVERLORD.** Tier 2 biometric parked (Q8). Codename skins (V): release + security both landed in the overlord flavour.
 
 **Doctor:** 16 mechanisms green. **PHASE 3 COMPLETE (minus the parked human proof).**
+
+---
+
+## Phase 4 — Kernel rebuilds + event→role wiring (2026-07-19)
+
+**4.1/4.2:** all 9 existing kernels rebuilt to the KERNEL-CONTRACT by a 9-agent parallel fleet (one file-owner each), every ratified absorption folded in (orchestrator: marketing dispatch + decision-queue, catch-all stripped · behavioral/visual: client-feedback trigger-or-park · systems: spec-currency + game-design payload · qa: standing release pass + instrumentation + persona-instrument toolkit (usability only, never fun) · ux: zero-instruction-play gate · dev-web: build-lane discipline + feature-build-starts routing · hardware: Interaction Platform producer side, sim-first, no purchase authority · mobile: benched, revisit trigger named). Five new role runbooks landed (spec-currency, qa-release-pass, zero-instruction-play-gate, build-lane, mobile-bench). **All 11 kernels pass kernel-lint** (2 rich + 9 thin... 3 rich: orchestrator/behavioral/visual — lint output in repo history); kernel+skin+command pairing verified for all 11 roles.
+
+**4.3:** `tools/events.json` + `tools/event-fire.js` — the standing table as a WIRE. Firing tests (M7, red→green): release-composed RUNS infra-check + the security detector and SUMMONS qa/security/release with their runbooks; every ratified event fires ≥1 wire; **mutation:** qa wire removed → event no longer summons qa (others untouched); ratified event deleted → loud unknown-event error; dead runbook target → test fails. Suite 133/133. Doctor: 17 mechanisms green.

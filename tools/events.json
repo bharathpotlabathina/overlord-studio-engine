@@ -1,0 +1,23 @@
+{
+  "comment": "Task 4.3 — the standing event->role wiring table (ratified 2026-07-19). 'standing' means WIRED HERE, not honour-system prose. Two wire kinds: check = a script event-fire runs immediately; summon = an instruction line event-fire emits for the session lead (role + runbook), consumed by the hook/orchestrator. Removing a wire makes the event fire nothing for that role (the firing tests assert this) and event-wiring-check flags uncovered ratified events.",
+  "events": {
+    "release-composed": [
+      { "kind": "check", "id": "infra-check-gate", "run": "tools/infra-check.js" },
+      { "kind": "check", "id": "security-detector", "run": "tools/checks/security-cert-selftest.js" },
+      { "kind": "summon", "role": "qa", "runbook": "methodology/playbooks/qa-release-pass.md", "why": "standing quality pass on every composed release" },
+      { "kind": "summon", "role": "security", "runbook": "methodology/playbooks/security-certificate.md", "why": "certificate requested" },
+      { "kind": "summon", "role": "release", "runbook": "methodology/playbooks/release-go-no-go.md", "why": "gate sequence" }
+    ],
+    "spec-lands": [
+      { "kind": "summon", "role": "systems", "runbook": "methodology/playbooks/spec-currency.md", "why": "spec-currency assertion, gate-enforced" }
+    ],
+    "feature-build-starts": [
+      { "kind": "summon", "role": "dev-web", "runbook": "methodology/playbooks/build-lane.md", "why": "dispatch-on-match: web features (mobile routes to the mobile role)" },
+      { "kind": "summon", "role": "systems", "runbook": "methodology/playbooks/spec-currency.md", "why": "if design is needed" }
+    ],
+    "client-feedback": [
+      { "kind": "summon", "role": "behavioral", "runbook": "personas/behavioral-kernel.md", "why": "un-gates the reprocess pass (trigger-or-park)" },
+      { "kind": "summon", "role": "visual", "runbook": "personas/visual-kernel.md", "why": "un-gates the reprocess pass (trigger-or-park)" }
+    ]
+  }
+}

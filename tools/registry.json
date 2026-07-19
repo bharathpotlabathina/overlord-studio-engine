@@ -138,6 +138,14 @@
       "lastVerified": "2026-07-19",
       "home": "V",
       "note": "Task 3.3 \u2014 HQ/vault-side: setup/local-auth-gate.swift (Tier 1 deviceOwnerAuthentication) + selftest.sh + update-sot playbook step 1b. macOS-only BY DESIGN (guards the studio machine, never ships to a vet \u2014 exempt from the portable-core no-POSIX rule). Check field nominal: the real check is vault setup/local-auth-gate-selftest.sh (V-side path, outside this repo). LIVE dialog red->green AWAITING OVERLORD PHYSICAL PROOF. Tier 2 biometric parked (Q8)."
+    },
+    {
+      "id": "event-role-wiring",
+      "trigger": "tools/event-fire.js",
+      "check": "tools/test/event-wiring.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 4.3 \u2014 standing event->role table (tools/events.json) + firer. M7 firing tests: checks RUN, summons EMIT; removed wire fires nothing; deleted ratified event errors loudly; dead runbook targets fail."
     }
   ],
   "documents": [

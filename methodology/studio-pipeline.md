@@ -21,15 +21,20 @@ Small isolated changes (typos, config tweaks, one-liner bugs) skip directly to B
 | # | Stage | Owner (role) | Skill | Model tier | Closing gate (class) | Artifact | State earned |
 |---|---|---|---|---|---|---|---|
 | −1 | Ideas | anyone | — | — | Director blessing (judgment) | board entry | pre-map |
-| 0 | Graduation | Producer | `/atlas-map-review` | session | per-item landing + "go" (judgment) | capability in map | Raw |
-| 1 | Intake | Producer + Atlas (head) | `/atlas-propose` | session | pick or decline (judgment) | selected capability | — |
+| 0 | Graduation | Director | `/atlas-map-review` | session | per-item landing + "go" (judgment) | capability in map | Raw |
+| 1 | Intake | Director + Atlas (head) | `/atlas-propose` | session | pick or decline (judgment) | selected capability | — |
 | 2 | Design | Product Strategist / orchestrator | `brainstorming` | top | self-review → **independent systems (deep) review pass** → spec approved (judgment) | spec in `docs/superpowers/specs/` | Designed *(Discussed earned mid-stage when exploration converges)* |
 | 3 | Plan | Systems Planner / systems | `writing-plans` | deep–top | self-review → **independent systems (deep) review pass** → plan user-reviewed, complexity markers present (judgment) | sprint plan in `docs/superpowers/plans/sprints/` | Ready |
 | 4 | Build | Build Lead / dev-web | `subagent-driven-development` (+`test-driven-development` in subagents) | per-task ladder by marker | machine build gates green per task; T1/T2 review per task (machine + review loop) | commits + SDD ledger | in flight |
-| 5 | Verify | QA / qa | `code-review` (T3) + `verification-before-completion` | top | T3 "ready" verdict (judgment on findings) | whole-branch review verdict | Built |
-| 6 | Ship & close | Producer | ship gate; state flip via `/atlas-map-review` | — | per-event sign-off; "go" landing (judgment/ship) | live capability; map updated | Live |
+| 5 | Verify | QA / qa (+ security on security-surface work) | `code-review` (T3) + `/security-review` on security surfaces + `verification-before-completion` | top | T3 "ready" verdict (judgment on findings); `/security-review` clear where it fired | whole-branch review verdict | Built |
+| 6 | Ship & close | Director + release | release composed per `playbooks/release-compose.md`; ship gate; state flip via `/atlas-map-review` | — | security certificate feeds go/no-go; end state **certified-awaiting-authorization** — the deploy act is the Director's alone; per-event sign-off; "go" landing (judgment/ship) | live capability; map updated | Live |
 
 Every state advance is **proposed, never automatic** — per-transition Director confirmation through `/atlas-map-review`. Staging the proposal is `node {{PLUGIN}}/tools/atlas-map-check.js propose-flip` at each phase gate; it proposes, never approves. Pending flips are swept at `/logout`.
+
+**Director-launched commands (adopted 2026-07-14).** Three first-party commands sit at their stages as standing options. All three are Director-launched (billed and/or interactive) — judgment/ship class, never machine-looped; a phase controller cannot fire them:
+- `/ultraplan` — Stage 3 heavy-plan **cloud-offload**. Precondition: a connected GitHub repo (not vault-only plans). Does not replace the independent review pass.
+- `/code-review ultra` — the Stage 5 T3 whole-branch review, escalated, on **big sprints / phase boundaries**; smaller sprints keep inline `code-review` T3.
+- `/security-review` — standing Stage 5 gate on **security-surface work** (auth, PII, secrets, deploy/permission config, external input, anything shipping outward). A non-clear verdict blocks Built like a T3 blocker.
 
 **Design/Plan review pass (standard, locked 2026-07-09).** Every spec (Stage 2) and every plan (Stage 3), after the authoring skill's own self-review, gets **one independent adversarial review pass** by a fresh reviewer (systems, deep/Opus tier, no authoring context) that hunts Blockers/Importants **before** the artifact reaches the Director's approval gate. The author integrates the findings — or pushes back with a system-level reason (`receiving-code-review`); a re-verify follows only if the pass surfaced blockers that materially reworked the artifact. This is the design-time analogue of the build-time T1–T3 code review (§4): self-review is marking your own homework; the independent pass is where real blockers surface (e.g. an independent plan-structure review gate that caught 4 blockers self-review had missed). Applies to all pipeline work.
 
@@ -55,7 +60,7 @@ is not rigor; it is paying for what the writing already does.
 | deep | Opus | judgment-tier tasks, planning, reviews of subtle diffs |
 | top | Fable (or best available) | design/strategy, final whole-branch review (T3) |
 
-**Who decides:** the Systems Planner rates every task at plan time — marker `transcription / standard / judgment` in the sprint plan. The phase controller dispatches the bound tier **mechanically**. No per-task Producer gate (model choice is reversible).
+**Who decides:** the Systems Planner rates every task at plan time — marker `transcription / standard / judgment` in the sprint plan. The phase controller dispatches the bound tier **mechanically**. No per-task Director gate (model choice is reversible).
 
 **Escalation:** a BLOCKED report that is not a context problem re-dispatches **one tier up** per retry, to top at most, then surfaces to the Director. This is the iteration loop applied to model capacity.
 

@@ -77,5 +77,5 @@ Active doc: `sessions/` root. Complete/superseded: move to `sessions/archive/`. 
 | `<name>-board.md` | Studio concerns → moved to `_claude/backlog.md` |
 | `sot/<name>-strategy.md` | MEMORY.md: `[Project Strategy](path) — one-line status + phase` |
 | `sot/<name>-spec.md` | MEMORY.md: `[Project Spec](path) — one-line technical status` |
-| `wiki/<name>-digest.md` | MEMORY.md: `[Project Digest](path) — compiled synthesis` |
+| `wiki/<name>-digest.md` | ~~MEMORY.md: `[Project Digest](path) — compiled synthesis`~~ (Graveyard 2026-07-15 with the wiki layer — no digests are produced; row kept as tombstone) |
 | Open sessions/ brief | Named in `_claude/HANDOFF.md` |

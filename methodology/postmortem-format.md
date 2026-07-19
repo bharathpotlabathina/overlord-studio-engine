@@ -17,5 +17,5 @@ Status: filed | open
 
 `Status: open` means the corrective action is not yet red→green-proven; the
 session-close check flags any postmortem left open. A hotfix without a filed
-postmortem is a gap the release runbook's close step flags (Release Engineer's
-checklist carries it once the role is born).
+postmortem is a gap the release runbook's close step flags (the release role's
+checklist carries it — `playbooks/release-sequence.md`).

@@ -122,3 +122,15 @@ a superseding proof gets a new entry.
 **macOS smoke:** `node test/run-smoke.js` → `smoke: PASS (suite + posix-only guard)` (109 tests + guard). **The Windows RUN is PARKED** — no Windows substrate exists on this machine (Q7: default UTM VM, no OS downloaded autonomously per standing order). AWAITING OVERLORD: substrate choice/installation; the smoke is one command once a box exists.
 
 **Doctor:** `checked 6, found 6 green · mechanism count: 6`.
+
+---
+
+## Tasks 2.1–2.3 — Consolidate-memory wire, CI gate, SessionStart consolidation (2026-07-19)
+
+**Task 2.1:** `consolidate-memory` wired to a REAL trigger — scheduled task `weekly-memory-consolidation` (Sun 07:02 local), replacing the printed reminder that provably never ran anything. Prompt carries the no-lossy-distillation (#39) and kills-preserved rules inline. **Firing proof PENDING the first scheduled run** (due within hours of creation — created on a Sunday morning); the disable-the-wire half of the acceptance is trivially the scheduler's enabled flag. Free-tier note: weekly token consumption, flagged.
+
+**Task 2.2 (Q2 default — local CI, zero remote minutes):** `tools/pre-push` is now the CI merge gate: full suite + posix-only guard (via `test/run-smoke.js`), then infra-check, all blocking. **Mutation:** appended a failing test → `smoke: FAIL` → `PUSH BLOCKED — CI suite ... failed`; reverted → all gates green. **No deploy step exists in the gate** (grep-verifiable; LAUNCH law — certify ≠ authorise; the repo holds zero deploy capability).
+
+**Task 2.3:** `studio-session-init.js` rewritten pure-Node as the single SessionStart wire absorbing session-init + HANDOFF-staleness (handoff-age.sh) + retro-count nudges, with a heartbeat beacon written every run and `tools/checks/heartbeat-check.js` registered in the doctor (missing-beacon = explicit cold line while the plugin is uninstalled; stale beacon = blocking once any beacon exists). **Red→green:** 4 new tests (stale HANDOFF → nudge / fresh → silent / retro count / no-bash assertion); the Task 1.5 dated posix exception is now DEAD — exception list empty again, guard fully clean. The engine-side Sunday printed reminder was deleted with the rewrite (its replacement — the 2.1 cron — exists first; movers after detectors).
+
+**Doctor:** `checked 9, found 9 green · mechanism count: 9`. Suite 113/113.

@@ -11,11 +11,8 @@ const ROOT = path.join(__dirname, '..');
 // Dated exceptions (fail-loud discipline: report-only is an explicit, dated,
 // reasoned exception — never a silent allowlist). Each is printed on every run.
 const EXCEPTIONS = [
-  {
-    file: 'studio-session-init.js',
-    dated: '2026-07-19',
-    reason: 'isWin-guarded legacy vault-setup bash call — platform-fenced (never runs on Windows), condemned to die at Task 2.3 SessionStart consolidation',
-  },
+  // (2026-07-19: studio-session-init.js's legacy bash call was the one exception;
+  // it died at Task 2.3's pure-Node rewrite, same day. List kept for the next one.)
 ];
 
 const PATTERNS = [

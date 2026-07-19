@@ -1,19 +1,36 @@
 #!/usr/bin/env node
-// Runs once per calendar day on first prompt. Replaces the manual /login ritual:
-// git pull + setup self-heal + source-of-truth drift check. Port of studio-session-init.sh.
+// SessionStart consolidation (Task 2.3) — one wire absorbing the old studio's three
+// UserPromptSubmit scripts (session-init, env-check-ish staleness, plugin nudges):
+// git pull + Node self-heal + sot/ read-only assertion + HANDOFF-staleness nudge +
+// unintegrated-retro nudge + timestamped heartbeat (a dead hook is caught by its
+// missing/stale beacon, not by silence). Runs once per calendar day; heartbeat
+// writes EVERY run. Pure Node — the legacy bash self-heal call is gone (its posix
+// exception dies with this rewrite). The printed Sunday memory reminder is gone
+// too: consolidate-memory is wired to a real scheduled trigger now (Task 2.1).
 'use strict';
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { tmpFlag, walk, isWritable, dateStamp, localHM, isoWeek, isWin } = require('./platform.js');
+const { tmpFlag, walk, isWritable, dateStamp, localHM } = require('./platform.js');
+
+const HANDOFF_STALE_DAYS = 3;
+
+function heartbeat(vault) {
+  try {
+    const dir = path.join(vault, '_claude', '.heartbeats');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'session-init'), new Date().toISOString() + '\n');
+  } catch { /* heartbeat must never block a session */ }
+}
 
 function main() {
   const VAULT = process.argv[2] || path.join(process.env.HOME || '', 'Documents', 'studio-vault');
+  if (!fs.existsSync(VAULT)) { process.stderr.write(`vault path not found: ${VAULT}\n`); process.exit(1); }
+
+  heartbeat(VAULT);
 
   const flag = tmpFlag(`studio-session-init-${dateStamp()}`);
   if (fs.existsSync(flag)) return;
-
-  if (!fs.existsSync(VAULT)) { process.stderr.write(`vault path not found: ${VAULT}\n`); process.exit(1); }
 
   // Pull latest — only mark the day done once it succeeds, so a failed pull
   // (offline, auth, conflict) retries next session instead of false success.
@@ -24,14 +41,11 @@ function main() {
     process.stderr.write('⚠️  git pull failed — vault may be stale (will retry next session)\n');
   }
 
-  // Self-heal (idempotent) — only if this vault carries a setup script. The vault's
-  // setup is a shell script (vault-side concern); on Windows the plugin's own
-  // first-run wiring is the /studio-setup skill, not this legacy shell path.
-  const vaultSetup = path.join(VAULT, 'setup', 'studio-setup.sh');
-  if (fs.existsSync(vaultSetup) && !isWin) {
-    try { process.stdout.write(execFileSync('bash', [vaultSetup], { cwd: VAULT, encoding: 'utf8' })); }
-    catch (e) { process.stdout.write((e.stdout || '').toString()); }
-  }
+  // Self-heal (idempotent, pure Node): scaffold missing vault dirs via studio-setup.
+  try {
+    const setup = require('./studio-setup.js');
+    if (typeof setup.scaffold === 'function') setup.scaffold(VAULT);
+  } catch { /* a broken self-heal must not block the session; doctor catches drift */ }
 
   // Assert sot/ docs are read-only (was: find -path "*/sot/*.md" -perm -0200).
   const projects = path.join(VAULT, 'Projects');
@@ -42,14 +56,23 @@ function main() {
     writableSot.forEach((p) => console.log(p));
   }
 
-  console.log(`Vault synced — ${localHM()}`);
-
-  // Weekly memory consolidation reminder (Sundays).
-  const weekFlag = tmpFlag(`studio-memory-consolidate-${new Date().getFullYear()}-${isoWeek()}`);
-  if (!fs.existsSync(weekFlag) && new Date().getDay() === 0) {
-    fs.writeFileSync(weekFlag, '');
-    console.log('📋 Weekly: consider consolidating MEMORY.md to clear drift.');
+  // HANDOFF staleness nudge (absorbed from handoff-age.sh).
+  const handoff = path.join(VAULT, '_claude', 'HANDOFF.md');
+  if (fs.existsSync(handoff)) {
+    const ageDays = (Date.now() - fs.statSync(handoff).mtimeMs) / 86400000;
+    if (ageDays > HANDOFF_STALE_DAYS) {
+      console.log(`⚠️  HANDOFF.md is ${Math.floor(ageDays)} days old — the restore card may be stale; update it before relying on it.`);
+    }
   }
+
+  // Unintegrated-retro nudge (absorbed from retro-count.sh).
+  const retroLog = path.join(VAULT, '_claude', 'retros', 'retro-log.md');
+  if (fs.existsSync(retroLog)) {
+    const open = fs.readFileSync(retroLog, 'utf8').split('\n').filter((l) => /^- \[ \]/.test(l)).length;
+    if (open > 0) console.log(`📋 ${open} unintegrated retro entr${open === 1 ? 'y' : 'ies'} — /retro-integrate when convenient.`);
+  }
+
+  console.log(`Vault synced — ${localHM()}`);
 }
 
 main();

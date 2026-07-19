@@ -55,7 +55,31 @@
       "check": "tools/checks/posix-only-check.js",
       "lastVerified": "2026-07-19",
       "home": "E",
-      "note": "Task 1.5 / B1 recurrence guard — call-shaped grep for POSIX-only primitives (flock, shell spawns, shell shebangs) across tools/. One dated exception (studio-session-init.js, dies at Task 2.3), printed loudly on every run. Windows RUN parked (Q7 substrate); smoke prepared as test/run-smoke.js."
+      "note": "Task 1.5 / B1 recurrence guard — call-shaped grep for POSIX-only primitives (flock, shell spawns, shell shebangs) across tools/. Exception list empty again since Task 2.3 killed the legacy bash call. Windows RUN parked (Q7 substrate); smoke prepared as test/run-smoke.js."
+    },
+    {
+      "id": "session-start-consolidation",
+      "trigger": "hooks/hooks.json",
+      "check": "tools/test/studio-session-init.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.3 — one SessionStart wire absorbing the old studio's three UserPromptSubmit scripts: pull + Node self-heal + sot read-only + HANDOFF-staleness nudge + retro nudge + heartbeat. Pure Node (bash exception retired same day). Replaces wires W01+W02+W03 at cutover (3 -> 1)."
+    },
+    {
+      "id": "heartbeat-recency",
+      "trigger": "tools/doctor.js",
+      "check": "tools/checks/heartbeat-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.3 — dead hooks caught by missing/stale beacons. Cold-tolerant by stated fact (plugin uninstalled = explicit cold line), blocking once beacons exist."
+    },
+    {
+      "id": "memory-consolidation-cron",
+      "trigger": "hooks/hooks.json",
+      "check": "tools/test/skill-audit.test.js",
+      "lastVerified": "2026-07-19",
+      "home": "V",
+      "note": "Task 2.1 — HQ-side wire: weekly scheduled task 'weekly-memory-consolidation' (Sun 07:02 local) runs the consolidate-memory skill with the no-lossy-distillation + kills-preserved rules inline. TRIGGER FIELD IS NOMINAL (the real trigger is the scheduler, machine-side); firing proof pending the first scheduled run — see PROOFS.md. Free-tier note: consumes plan tokens weekly, flagged in HANDOFF."
     }
   ],
   "documents": []

@@ -1,18 +1,25 @@
 #!/usr/bin/env node
-// Node pre-push gate (Task 1.3 wiring) — runs infra-check before any push.
-// Cold-safe: with no infra-check.json at the repo root, infra-check prints its
-// explicit N/A line and exits 0 (m6), so this gate never blocks a cold install.
+// Node pre-push gate — the local CI merge gate (Task 2.2, Q2 default: local hooks,
+// zero remote CI minutes) + infra-check wiring (Task 1.3).
+// Blocking checks, in order: full test suite + posix-only guard (via run-smoke),
+// then infra-check. Deploy is NEVER a step here — certify != authorise (LAUNCH law);
+// this repo holds zero deploy capability and this gate must keep it that way.
+// Cold-safe: with no infra-check.json, infra-check prints its N/A line and exits 0.
 // This file is the cutover TARGET for the vault-side bash pre-push (wire W11);
-// the dist-leak/preflight half of W11 migrates separately and nothing retires
-// until this replacement is proven (0.2b discipline).
+// nothing retires until this replacement is proven (0.2b discipline).
 'use strict';
-const { execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const path = require('path');
 
-try {
-  execFileSync('node', [path.join(__dirname, 'infra-check.js')], { stdio: 'inherit' });
-} catch (e) {
-  console.log('PUSH BLOCKED — infra-check failed (see violations above).');
-  process.exit(e.status || 1);
+function gate(name, script) {
+  const r = spawnSync(process.execPath, [script], { stdio: 'inherit' });
+  if (r.status !== 0) {
+    console.log(`PUSH BLOCKED — ${name} failed (see above).`);
+    process.exit(r.status || 1);
+  }
 }
+
+gate('CI suite (tests + posix-only guard)', path.join(__dirname, '..', 'test', 'run-smoke.js'));
+gate('infra-check', path.join(__dirname, 'infra-check.js'));
+console.log('pre-push gates green: CI suite + infra-check. (No deploy step exists in this gate, by law.)');
 process.exit(0);

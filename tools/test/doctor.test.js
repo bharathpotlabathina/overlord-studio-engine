@@ -131,3 +131,65 @@ test('empty registry still runs and reports zero mechanisms explicitly (silence 
   assert.match(r.out, /checked 0, found 0 green/);
   assert.match(r.out, /mechanism count: 0/);
 });
+
+// --- install staleness (2026-07-19 incident: marketplace refreshed, install didn't
+// follow, hooks ran a version behind the pushed engine — local-only gauge, no network).
+
+function newPluginsDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'plugins-'));
+}
+
+function writePluginManifest(dir, name, version) {
+  fs.mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), JSON.stringify({ name, version }));
+}
+
+function newCacheInstall(pluginsDir, mkt, name, version) {
+  const root = path.join(pluginsDir, 'cache', mkt, name, version);
+  fs.mkdirSync(path.join(root, 'hooks'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'tools', 'checks'), { recursive: true });
+  writePluginManifest(root, name, version);
+  writeRegistry(root, []);
+  return root;
+}
+
+function runWithPlugins(root, pluginsDir) {
+  try {
+    const out = execFileSync('node', [SCRIPT], {
+      env: { ...process.env, STUDIO_ROOT: root, STUDIO_PLUGINS_DIR: pluginsDir }, encoding: 'utf8',
+    });
+    return { code: 0, out: out.trim() };
+  } catch (e) {
+    return { code: e.status, out: (e.stdout || '').toString().trim(), err: (e.stderr || '').toString() };
+  }
+}
+
+test('marketplace install matching the marketplace clone -> install current, stays green', () => {
+  const pluginsDir = newPluginsDir();
+  const root = newCacheInstall(pluginsDir, 'acme', 'acme-engine', '1.0.0');
+  writePluginManifest(path.join(pluginsDir, 'marketplaces', 'acme'), 'acme-engine', '1.0.0');
+  const r = runWithPlugins(root, pluginsDir);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /install-staleness: current/);
+});
+
+test('marketplace clone ahead of the install -> STALE, named update command, blocks exit 0', () => {
+  const pluginsDir = newPluginsDir();
+  const root = newCacheInstall(pluginsDir, 'acme', 'acme-engine', '1.0.0');
+  writePluginManifest(path.join(pluginsDir, 'marketplaces', 'acme'), 'acme-engine', '1.0.1');
+  const r = runWithPlugins(root, pluginsDir);
+  assert.notStrictEqual(r.code, 0);
+  assert.match(r.out, /STALE INSTALL/);
+  assert.match(r.out, /1\.0\.0/);
+  assert.match(r.out, /1\.0\.1/);
+  assert.match(r.out, /claude plugin update acme-engine@acme/);
+});
+
+test('root outside the plugins cache (dev checkout) -> explicit N/A, stays green', () => {
+  const pluginsDir = newPluginsDir();
+  const root = newRoot();
+  writeRegistry(root, []);
+  const r = runWithPlugins(root, pluginsDir);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /install-staleness: N\/A/);
+});

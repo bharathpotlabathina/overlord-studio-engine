@@ -15,6 +15,7 @@
 // code, so a check mutated to always-pass cannot hide a missing trigger.
 'use strict';
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
@@ -36,6 +37,39 @@ function listFiles(dir) {
     else out.push(full);
   }
   return out;
+}
+
+// Install-staleness gauge (2026-07-19 incident: marketplace clone refreshed but the
+// installed plugin didn't follow — hooks ran a version behind the pushed engine).
+// Local-only by design: two file reads, no network, safe cold/offline/unattended.
+// The network half (is GitHub ahead of the clone?) is the push ritual's job
+// (tools/push.js). Doctor built-in, not a registered mechanism — the Law-5 ceiling
+// (frozen at 19, may only shrink) rules out a new wire; like dead-wire and orphan
+// detection, this is part of what the doctor IS.
+function installStaleness(root, pluginsDir) {
+  const read = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
+  const rel = path.relative(pluginsDir, root);
+  const seg = rel.split(path.sep);
+  if (rel.startsWith('..') || path.isAbsolute(rel) || seg[0] !== 'cache' || seg.length < 4) {
+    return { stale: false, line: 'install-staleness: N/A (not a marketplace install)' };
+  }
+  const mkt = seg[1];
+  try {
+    const installed = read(path.join(root, '.claude-plugin', 'plugin.json'));
+    const clone = read(path.join(pluginsDir, 'marketplaces', mkt, '.claude-plugin', 'plugin.json'));
+    if (clone.name !== installed.name) {
+      return { stale: false, line: 'install-staleness: N/A (marketplace manifest names a different plugin)' };
+    }
+    if (clone.version === installed.version) {
+      return { stale: false, line: `install-staleness: current (v${installed.version} = marketplace v${clone.version})` };
+    }
+    return {
+      stale: true,
+      line: `STALE INSTALL — running v${installed.version}, marketplace clone has v${clone.version}: run \`claude plugin update ${installed.name}@${mkt}\` (restart applies it)`,
+    };
+  } catch {
+    return { stale: false, line: 'install-staleness: N/A (manifests unreadable)' };
+  }
 }
 
 function runDoctor(root) {
@@ -79,6 +113,11 @@ function runDoctor(root) {
       }
     }
   }
+
+  const pluginsDir = process.env.STUDIO_PLUGINS_DIR || path.join(os.homedir(), '.claude', 'plugins');
+  const staleness = installStaleness(root, pluginsDir);
+  if (staleness.stale) ok = false;
+  lines.push(staleness.line);
 
   lines.push(`checked ${mechanisms.length}, found ${greenCount} green`);
   lines.push(`mechanism count: ${mechanisms.length}`);

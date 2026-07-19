@@ -146,6 +146,14 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 4.3 \u2014 standing event->role table (tools/events.json) + firer. M7 firing tests: checks RUN, summons EMIT; removed wire fires nothing; deleted ratified event errors loudly; dead runbook targets fail."
+    },
+    {
+      "id": "core-overlay-dedup",
+      "trigger": "tools/checks/dedup-check.js",
+      "check": "tools/checks/dedup-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 5.1 (M6) \u2014 verbatim dup detector, engine core vs vault overlay (reference-only rule). CURRENTLY RED BY DESIGN: 2 real pre-existing codex<->handbook dupes found on first run; clears when the staged codex landing (docs/superpowers/proposals/2026-07-19-five-laws-codex-landing.md, vault) is landed by the Director via the source-of-truth gate. Paraphrase drift = registered human-judgment check, not claimed covered."
     }
   ],
   "documents": [

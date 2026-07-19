@@ -19,7 +19,7 @@ Projects/<project-name>/
 │   └── archive/                    ← stale session docs move here
 ├── calibration/                    ← additive (hardware layer only)
 ├── open-tasks.md                   ← dynamic bug/task tracking. Not source-of-truth.
-├── wiki/                           ← compiled synthesis, generated at /logout
+├── wiki/                           ← NOT BUILT — the compiled-wiki layer went Graveyard 2026-07-15 (builds the class of derived view that lies); kept in the tree diagram as a tombstone, kills preserved
 └── <name>-board.md                 ← backlog + parking lot
 ```
 

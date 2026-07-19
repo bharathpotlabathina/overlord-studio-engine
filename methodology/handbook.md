@@ -6,6 +6,16 @@ Roles load this file up to (but not including) the `## Role Doctrine` section fo
 
 ---
 
+## The Five Laws (ratified 2026-07-19)
+
+1. **Native first.** Compose the platform's own features (hooks, skills, subagents, schedulers) before building parallel machinery. Hand-rolls that duplicate native features are debt.
+2. **Absorb, don't derive.** Learn from reference practice and absorb what fits; never cargo-cult ceremony that solves a problem this studio does not have.
+3. **Simplest mechanism that holds.** One mechanism per job. A single source for every fact — duplication is a drift site.
+4. **Wired or it doesn't exist.** A mechanism is real only when a trigger fires it and a check can go red. Declared-but-unwired is the studio's named disease; every mechanism carries a birth certificate (red→green proof) and lives in the wiring registry (`tools/registry.json`, run `node tools/doctor.js`).
+5. **Built like a tractor.** Day in, day out, attended or unattended, watched or unwatched — identical behavior. Few parts, each too simple to break. Loud, visible failure (silence ≠ success; every check prints positive proof). Elimination before interlocks before monitoring — delete beats instrument. Shear pins, not gauges. Idempotent, garbage-tolerant, append-only where state matters. The mechanism count must not grow: additions pair with retirements.
+
+---
+
 ## Production Principles
 
 - **Nothing ships without QA.** Every deliverable is tested before it leaves the studio. A deployment target is not a testing environment.

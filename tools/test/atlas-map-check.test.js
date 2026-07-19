@@ -324,3 +324,20 @@ test('unknown cap refused', () => {
   const v = vaultWithMap(); const r = runFlip(v, 'CAP-099', 'Live');
   assert.strictEqual(r.code, 1); assert.deepStrictEqual(staged(v), []);
 });
+
+// I-95 (Stage 3 Task 5.3): Graveyard'd caps must not inflate phase progress.
+test('phases: Graveyard excluded from denominator, shown as retired', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'i95-'));
+  const map = path.join(dir, 'map.json');
+  fs.writeFileSync(map, JSON.stringify({
+    meta: { corrected: [] }, pillars: [], flows: [],
+    capabilities: [
+      { id: 'CAP-001', state: 'Live', tags: ['phase-1'] },
+      { id: 'CAP-002', state: 'Live', tags: ['phase-1'] },
+      { id: 'CAP-003', state: 'Graveyard', tags: ['phase-1'] },
+    ],
+    relationships: [],
+  }));
+  const r = run([SCRIPT, 'phases', map]);
+  assert.match(r.out, /phase-1: 2\/2 Live \(\+1 retired\)/);
+});

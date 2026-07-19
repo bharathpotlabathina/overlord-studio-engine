@@ -289,9 +289,14 @@ function runPhases(p) {
   if (phases.size === 0) { console.log('no phase tags in map'); return 0; }
   for (const phase of [...phases.keys()].sort()) {
     const caps = phases.get(phase);
-    const live = caps.filter((c) => c.state === 'Live').length;
-    const inFlight = caps.filter((c) => ['Designed', 'Ready', 'Built'].includes(c.state));
-    let line = `${phase}: ${live}/${caps.length} Live`;
+    // I-95 fix (2026-07-19): Graveyard excluded from the denominator (a killed
+    // item is not pending work) but shown — kills preserved, never hidden.
+    const active = caps.filter((c) => c.state !== 'Graveyard');
+    const graveyard = caps.length - active.length;
+    const live = active.filter((c) => c.state === 'Live').length;
+    const inFlight = active.filter((c) => ['Designed', 'Ready', 'Built'].includes(c.state));
+    let line = `${phase}: ${live}/${active.length} Live`;
+    if (graveyard) line += ` (+${graveyard} retired)`;
     if (inFlight.length) {
       line += ' — in flight: ' + inFlight.map((c) => `${c.id || '?'} ${c.state || '?'}`).join(', ');
     }

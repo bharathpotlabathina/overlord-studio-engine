@@ -122,6 +122,22 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 3.0 \u2014 kernel structural conformance to personas/KERNEL-CONTRACT.md: frontmatter, required sections, thin/rich rules, live runbook links, standing-events wired, no codenames."
+    },
+    {
+      "id": "security-certificate",
+      "trigger": "methodology/playbooks/security-certificate.md",
+      "check": "tools/checks/security-cert-selftest.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 3.2 \u2014 the certificate's core detector self-test: a seeded prod-secret-in-preview exposure must go RED. Stub-to-always-issue makes the self-test fail loudly (mutation-proven). Certificate issuance itself is the Security Engineer's runbook act."
+    },
+    {
+      "id": "local-auth-gate",
+      "trigger": "tools/doctor.js",
+      "check": "tools/checks/registry-schema-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "V",
+      "note": "Task 3.3 \u2014 HQ/vault-side: setup/local-auth-gate.swift (Tier 1 deviceOwnerAuthentication) + selftest.sh + update-sot playbook step 1b. macOS-only BY DESIGN (guards the studio machine, never ships to a vet \u2014 exempt from the portable-core no-POSIX rule). Check field nominal: the real check is vault setup/local-auth-gate-selftest.sh (V-side path, outside this repo). LIVE dialog red->green AWAITING OVERLORD PHYSICAL PROOF. Tier 2 biometric parked (Q8)."
     }
   ],
   "documents": [

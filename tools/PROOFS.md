@@ -154,3 +154,17 @@ a superseding proof gets a new entry.
 **Task 2.7:** `methodology/postmortem-format.md` (one dated paragraph: What/Why/Fix/Corrective action/Status) · `tools/checks/postmortem-lint.js` wired to session close (Stop hook) and doctor-runnable · two retroactive postmortems FILED V-side as the format seed (017 collision → corrective action Task 1.1; preview→prod near-miss → corrective action Task 1.3 — both corrective actions are tonight's proven mechanisms, so both file as `Status: filed`, honestly). **Mutation:** a `Status: open` fixture → `POSTMORTEM FLAG` exit 1; removed → `checked 2, all well-formed and closed`.
 
 **Doctor:** 13 mechanisms green. **PHASE 2 COMPLETE.**
+
+---
+
+## Phase 3 — Kernel contract + two role births + local-auth gate (2026-07-19)
+
+**Task 3.0:** `personas/KERNEL-CONTRACT.md` + `tools/kernel-lint.js`. Red→green 6/6 (missing section, thin-with-Voice, dead runbook link, unwired standing event, codename mention all fail; conforming thin AND rich kernels pass).
+
+**Task 3.1 — Release Engineer born.** `personas/release-kernel.md` (thin, opus, standing on release-composed; kernel-lint conforms) · neutral skin · `/summon-release` command · SEVEN runbooks (compose incl. the ratified coupling taxonomy sweep with named owners + Ship-or-Remove; sequence; version; rollback; go-no-go; notes; infra-check operation). **2am-rollback acceptance, run for real with fresh cold subagents:** round 1–3 dead-ended on REAL gaps (undefined infra-check invocation, prose-only migration inverses, missing abort-check query, missing product-root path, external credentials) — each fed back into the compose contract as record-field REQUIREMENTS; round 4: **COMPLETES** cold from the runbook + record alone. **Mutation:** DB-state precondition stripped → fresh reader **DEAD-ENDS at the migration gate** (refuses to trust the record's historical claim over live state — exactly the designed failure). Transcripts in the session record.
+
+**Task 3.2 — Security Engineer born.** `personas/security-kernel.md` (thin, opus, standing on release-composed + security-surface-change; conforms) · neutral skin · `/summon-security` · `security-certificate.md` runbook (ISSUED/WITHHELD, evidence per line, full re-check after remediation). **Self-test:** seeded prod-secret-in-preview → detector RED → certificate can go red; **mutation:** infra-check failure branch stubbed off → self-test fails loudly ("Issue NO certificates until fixed"); restored → green.
+
+**Task 3.3 — Local-auth gate (V-side), built to completion-minus-the-human-step.** The sweep proved NO prior artifact existed despite the dry-run claim — built from zero: `setup/local-auth-gate.swift` (Tier 1 deviceOwnerAuthentication, 120s timeout fail-closed, exit-code-only contract) + `setup/local-auth-gate-selftest.sh` (3 checks PASS: parses, fail-closed convention, playbook wiring) + `/update-sot` step 1b (any non-zero = stop, never retry-loop). **LIVE dialog red→green (cancel=1, authenticate=0) AWAITS OVERLORD.** Tier 2 biometric parked (Q8). Codename skins (V): release + security both landed in the overlord flavour.
+
+**Doctor:** 16 mechanisms green. **PHASE 3 COMPLETE (minus the parked human proof).**

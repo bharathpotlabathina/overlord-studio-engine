@@ -29,7 +29,7 @@ standing-events: []          # events that auto-fire this role (empty = commissi
 ## Thin kernels (heavy-runbook roles)
 
 - MUST carry `## Runbooks` — a linkage block of `- runbook: <repo-relative path>`
-  lines; every path must exist. The docs ARE the role: a summoned minion starts
+  lines; every path must exist. The docs ARE the role: a summoned role starts
   cold, and whatever isn't written down does not exist.
 - MUST NOT carry `## Voice` — persona depth for thin roles lives in the flavour
   skin, not the kernel.

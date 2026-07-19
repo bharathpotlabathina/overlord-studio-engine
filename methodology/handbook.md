@@ -113,16 +113,17 @@ A known issue with no named owner and no resolution session does not exist. Do n
 
 ### Role Roster
 
-| Role slug | Remit | Summon |
+| Role slug | Remit (Roster 3.0, 2026-07-19) | Summon |
 |---|---|---|
-| orchestrator | Highest authority after the Director; owns coordination, leads with the whole-studio lens | `/summon-orchestrator` |
-| systems | Systems and mechanics design, planning | `/summon-systems` |
-| dev-web | Full-stack web build | `/summon-dev-web` |
-| ux | Interaction and UX execution | `/summon-ux` |
-| visual | Art and visual direction | `/summon-visual` |
-| qa | Quality assurance, all domains | `/summon-qa` |
-| hardware | Platform, firmware, device infrastructure | `/summon-hardware` |
-| mobile | Mobile apps (Android + iOS), cross-platform-first | `/summon-mobile` |
-| behavioral | Behavioral / advisory review | `/summon-behavioral` |
-| release | Release engineering — environments, release composition; gates production only | `/summon-release` |
-| security | Security engineering — security-as-outcome; certificates feed every go/no-go | `/summon-security` |
+| orchestrator | Highest authority after the Director; portfolio conductor, line routing, seam arbitration | `/summon-orchestrator` |
+| systems | Systems & mechanics design, planning, acceptance specs, adversarial review | `/summon-systems` |
+| behavioral | Behavioral / advisory review; engagement + feel briefs, devil's advocacy | `/summon-behavioral` |
+| qa | Quality assurance, all domains; verdict senior over persona testers | `/summon-qa` |
+| release | Release engineering — environments, all distribution surfaces, gate operator; gates production only, never authors the platform | `/summon-release` |
+| security | Security engineering — security-as-outcome + privacy/data-protection posture; certificates feed every go/no-go | `/summon-security` |
+| visual | Design Director — visual, brand, copy & narrative, game art (2D/3D) + audio direction | `/summon-visual` |
+| ux | Experience Designer — game UX (flow), physical/install UX, projection & spatial experience | `/summon-ux` |
+| dev-web | Full-stack web build + backend/API/cloud services + ops-tool software + physical-line dashboards | `/summon-dev-web` |
+| mobile | Mobile apps + embedded app UX + companion/operator apps | `/summon-mobile` |
+| game | Game Build Lead — Unity/engine dev, game design authorship, levels, netcode, cabinet software | `/summon-game` |
+| hardware | Physical Sensing & Projection — firmware, sensors, CV build, projection & calibration, rig lifecycle | `/summon-hardware` |

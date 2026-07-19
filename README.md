@@ -69,11 +69,12 @@ Summon any role for deep interactive work; the orchestrator dispatches bounded w
 | `/summon-orchestrator` | Orchestrator — strategy, PM, dispatch (the default voice) |
 | `/summon-systems` | Systems / planning |
 | `/summon-dev-web` | Web build + deploy |
-| `/summon-ux` | Non-web UX (LBE, cabinet, kiosk, embedded) |
-| `/summon-visual` | Visual direction |
+| `/summon-ux` | Experience design — game UX, physical installs, projection & spatial |
+| `/summon-visual` | Design direction — visual, brand, copy, game art + audio |
 | `/summon-qa` | QA / verification |
-| `/summon-hardware` | Hardware / firmware / device platform |
-| `/summon-mobile` | Mobile — Android/iOS app build (cross-platform-first) |
+| `/summon-hardware` | Physical sensing & projection — rigs, CV build, calibration, install lifecycle |
+| `/summon-mobile` | Mobile — Android/iOS app build + app UX (cross-platform-first) |
+| `/summon-game` | Game build — Unity/engine dev, game design, levels, netcode |
 | `/summon-behavioral` | Behavioral / verification counterweight |
 | `/summon-release` | Release engineering — environments, release composition; gates production |
 | `/summon-security` | Security engineering — security certificates feed every go/no-go |

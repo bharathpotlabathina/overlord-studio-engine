@@ -8,6 +8,9 @@
 //   - orphans      (a file under a wiring root that no mechanism claims as its trigger)
 //   - failed checks (registered check script exits non-zero)
 //   - "checked N, found M green" + the live mechanism count (silence != success)
+// STUDIO_DOCTOR is a RESERVED env name: the doctor sets it on its check subtree
+// so doctor-calling flows (session-init's gauge) no-op instead of recursing.
+// Exporting it ambiently in a shell suppresses the session health gauge — don't.
 // Dead-wire detection reads the filesystem directly and never trusts a check's exit
 // code, so a check mutated to always-pass cannot hide a missing trigger.
 'use strict';

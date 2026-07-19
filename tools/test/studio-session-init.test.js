@@ -21,10 +21,12 @@ function newVault() {
   return { v, tmp };
 }
 
-function run(v, tmp) {
+function run(v, tmp, { gauge = false } = {}) {
+  // Default suppresses the doctor gauge (STUDIO_DOCTOR=1): only the flow-B test
+  // asserts it, and every gauge run costs a full doctor (~2s × 5 tests otherwise).
   const r = require('child_process').spawnSync('node', [SCRIPT, v], {
     encoding: 'utf8',
-    env: { ...process.env, TMPDIR: tmp, TMP: tmp, TEMP: tmp },
+    env: { ...process.env, TMPDIR: tmp, TMP: tmp, TEMP: tmp, STUDIO_DOCTOR: gauge ? '' : '1' },
   });
   return { out: r.stdout, err: r.stderr };
 }
@@ -65,7 +67,7 @@ test('open retro entries -> counted nudge (real retro-log format); none -> silen
 test('doctor health line printed on every session open (battery flow-B wire)',
   { skip: !!process.env.STUDIO_DOCTOR }, () => {
   const { v, tmp } = newVault();
-  const { out } = run(v, tmp);
+  const { out } = run(v, tmp, { gauge: true });
   // Green engine -> one-line gauge. The red path ("DOCTOR RED") rides the same
   // wire; red-state detection itself is covered by doctor.test.js.
   assert.match(out, /🩺 doctor: \d+ mechanisms green/);

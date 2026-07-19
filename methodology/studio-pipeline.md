@@ -35,6 +35,16 @@ Every state advance is **proposed, never automatic** — per-transition Director
 
 ## 3. Model ladder
 
+**The operating default (ratified 2026-07-19): the studio runs on the standard
+tier.** Your session — the Orchestrator included — operates on Sonnet-class
+models by default; the kernels, routing tables, and gates carry the
+intelligence, and every kernel is certified by cold standard-tier audit before
+it ships. Escalation happens per-dispatch, downward into subagents, only when
+a task genuinely needs a deeper mind — plans and adversarial reviews go up a
+tier, security certification goes up a tier, and anything else escalates only
+when the dispatcher names why. Running the whole studio on an expensive tier
+is not rigor; it is paying for what the writing already does.
+
 **Tiers** (names used everywhere in this doc) and current mapping — this table is the only place model names appear:
 
 | Tier | Current binding | Used for |

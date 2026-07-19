@@ -144,3 +144,13 @@ a superseding proof gets a new entry.
 **Task 2.5:** `tools/expand-contract-check.js` — destructive op (DROP COLUMN/TABLE, RENAME) on table T requires a prior additive migration touching T; same-file additive does not count (the single-migration disease). Wired into the pre-commit composite on staged migration dirs. **Discipline note, honestly:** impl was written before the tests ran red (a TDD slip); the red half was then proven by mutation — neutering the DESTRUCTIVE pattern made the block-tests fail (gate goes silent = tests catch it), restore → 4/4. Acceptance: bare DROP COLUMN blocked; expand→contract split passes; DROP TABLE with/without prior CREATE both behave.
 
 **Doctor:** `checked 11, found 11 green · mechanism count: 11`. Suite 122/122.
+
+---
+
+## Tasks 2.6 + 2.7 — State contract + conformance; postmortem format + flag (2026-07-19)
+
+**Task 2.6:** `schemas/state-contract.json` v1 (tracked-object/body state, transport-agnostic, additive-only within a major) · `methodology/interaction-platform.md` (First Playable as the first gate; LBE location/earnings tests as milestones 6–7 with thresholds honestly TBD-by-first-test; tiered cut lists as kill-preservation run forward) · `tools/checks/schema-conformance-check.js`. **Mutation:** declared `contract-field: objects.position` (divergent name) in the consumer doc → `SCHEMA CONFORMANCE FAILED` naming it; removed → `checked 4 declared fields, all conform to v1`. No hardware spend anywhere (G3 anti-scope).
+
+**Task 2.7:** `methodology/postmortem-format.md` (one dated paragraph: What/Why/Fix/Corrective action/Status) · `tools/checks/postmortem-lint.js` wired to session close (Stop hook) and doctor-runnable · two retroactive postmortems FILED V-side as the format seed (017 collision → corrective action Task 1.1; preview→prod near-miss → corrective action Task 1.3 — both corrective actions are tonight's proven mechanisms, so both file as `Status: filed`, honestly). **Mutation:** a `Status: open` fixture → `POSTMORTEM FLAG` exit 1; removed → `checked 2, all well-formed and closed`.
+
+**Doctor:** 13 mechanisms green. **PHASE 2 COMPLETE.**

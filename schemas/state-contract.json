@@ -1,0 +1,26 @@
+{
+  "name": "tracked-state-contract",
+  "version": 1,
+  "description": "Shared tracked-object/body state schema (Task 2.6, gap-map #19). Generalises ball-state to any tracked object or body. Four consumer classes, one schema: game logic, renderer, telemetry, actuation. Transport-agnostic: OSC bundle (address /tracked/state) or raw UDP JSON — payload fields identical either way.",
+  "fields": {
+    "ts": "sender monotonic timestamp, ms",
+    "seq": "monotonic frame sequence number",
+    "source": "sensor/tracker id string",
+    "objects": "array of tracked entities",
+    "objects.id": "stable per-object id within a session",
+    "objects.kind": "object class: ball | cue | body | hand | marker | custom:<name>",
+    "objects.pos": "[x,y,z] metres, right-handed, origin per install calibration",
+    "objects.vel": "[x,y,z] m/s",
+    "objects.conf": "0..1 tracker confidence",
+    "objects.joints": "optional pose skeleton: array of {name, pos, conf} for kind=body",
+    "events": "array of discrete events",
+    "events.type": "event class: contact | pocket | zone-enter | zone-exit | gesture | custom:<name>",
+    "events.ts": "event timestamp, ms",
+    "events.data": "event-specific payload object"
+  },
+  "rules": [
+    "consumers declare consumed fields with `contract-field: <dotted-name>` lines in their product doc; schema-conformance-check verifies membership",
+    "additive evolution only within a major version — renames/removals bump the major (expand/contract applied to the wire format)",
+    "a divergent field name in any consumer doc fails the conformance check (Law 4)"
+  ]
+}

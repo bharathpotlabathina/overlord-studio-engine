@@ -96,7 +96,28 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 2.5 — destructive migration op requires a prior additive migration on the same table; same-file additive does not count. Wired into the pre-commit composite (distinct trigger->check pair, recorded distinctly per the B2 counting rule)."
+    },
+    {
+      "id": "schema-conformance",
+      "trigger": "schemas/state-contract.json",
+      "check": "tools/checks/schema-conformance-check.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.6 — consumer docs declare contract-field lines; divergent names fail. Mutation-proven (objects.position rejected)."
+    },
+    {
+      "id": "postmortem-flag",
+      "trigger": "hooks/hooks.json",
+      "check": "tools/checks/postmortem-lint.js",
+      "lastVerified": "2026-07-19",
+      "home": "E",
+      "note": "Task 2.7 — session-close (Stop) postmortem lint: format enforced, Status:open flagged loudly. Incident texts live V-side (_claude/postmortems/); 017-collision + prod-DB near-miss filed retroactively as the format seed."
     }
   ],
-  "documents": []
+  "documents": [
+    { "id": "subagent-brief-template", "path": "methodology/subagent-brief-template.md", "note": "dispatch contract (Task 2.4) — document, exempt from the Law-5 count" },
+    { "id": "interaction-platform", "path": "methodology/interaction-platform.md", "note": "milestones + cut lists + contract consumers (Task 2.6) — document" },
+    { "id": "postmortem-format", "path": "methodology/postmortem-format.md", "note": "postmortem format seed (Task 2.7) — document" },
+    { "id": "state-contract-schema", "path": "schemas/state-contract.json", "note": "shared tracked-state schema v1 (Task 2.6) — document/schema; its conformance CHECK is the counted wire" }
+  ]
 }

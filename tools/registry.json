@@ -5,7 +5,8 @@
     "N_old_live": 12,
     "N_old_declared": 20,
     "projected_N_new": "17-21",
-    "finding": "projection shows N_new >= N_old under the live-only baseline; which baseline binds (live=12 vs declared=20) is PARKED for the Director \u2014 surfaced at Phase 0 per plan Task 0.2a, not deferred to Phase 6"
+    "finding": "RULED 2026-07-19 (Director, hybrid): declared baseline (20) binds for the Stage-3 transition gate; at cutover the then-live count freezes into frozenLiveBaseline and becomes the ceiling (count may only shrink). Decision of record: vault _claude/memory/studio_decisions.md.",
+    "frozenLiveBaseline": null
   },
   "wiringRoots": [
     "hooks"

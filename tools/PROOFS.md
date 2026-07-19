@@ -201,4 +201,4 @@ a superseding proof gets a new entry.
 
 **6.3: PARKED by standing order** — no CLI upgrade mid-marathon; run at a session boundary, then the Workflows trial.
 
-**6.4: PARKED (the closing milestone needs sessions + the Director).** Next session's opening move: summon the Release Engineer, compose Sakori Release 1 from `p13-integration` per `release-compose.md` (first act, feeds G1 exit a). Part (b)'s fresh-account cold install + Windows substrate + vet reviewer all await his rulings (Q4/Q7).
+**6.4: PARKED (the closing milestone needs sessions + the Director).** Next session's opening move: summon the Release Engineer, compose the client ATS Release 1 from `p13-integration` per `release-compose.md` (first act, feeds G1 exit a). Part (b)'s fresh-account cold install + Windows substrate + vet reviewer all await his rulings (Q4/Q7).

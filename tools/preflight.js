@@ -166,11 +166,16 @@ function checkFlags() {
 }
 
 // 6. Leak scan, if the vault's scanner is reachable. Distribution repos must not
-//    carry private names, personas, or local-rig jargon.
-function checkLeakScan() {
-  const scanner = path.join(os.homedir(), 'Documents/overlord-vault/setup/dist-leak-scan.js');
+//    carry private names, personas, or local-rig jargon. REPO MODE (--repo) is
+//    load-bearing: for its whole life before 2026-07-20 this call passed the repo
+//    directory as a FILE argument — the scanner read nothing and printed clean,
+//    so every board ever read carried a hollow green on this row. This board's
+//    own disease, on its own soil. preflight-leak.test.js pins the wiring.
+function checkLeakScan(scanner, root) {
+  scanner = scanner || path.join(os.homedir(), 'Documents/overlord-vault/setup/dist-leak-scan.js');
+  root = root || ROOT;
   if (!fs.existsSync(scanner)) return record('leak scan', null, 'scanner not on this machine — run before push');
-  try { sh('node', [scanner, ROOT]); return record('leak scan', true, 'clean'); }
+  try { sh('node', [scanner, '--repo', root]); return record('leak scan', true, 'clean'); }
   catch (e) { return record('leak scan', false, ((e.stdout || '') + (e.stderr || '')).trim().split('\n').slice(0, 2).join(' ')); }
 }
 
@@ -247,4 +252,5 @@ function main() {
   process.stdout.write('    it is the right to ask. The Overlord says GO.\n\n');
 }
 
-main();
+if (require.main === module) main();
+module.exports = { checkLeakScan };

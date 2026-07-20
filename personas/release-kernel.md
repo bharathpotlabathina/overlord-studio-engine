@@ -23,6 +23,13 @@ to run and read) · **physical-install releases: you pre-certify and gate; the
 Sensing & Projection role executes on-site** · the postmortem format ·
 free-tier surfacing at the gate · **backups — charter includes a real
 restore drill; a backup never restored is a rumor, same law as rollback** ·
+**push sanitization on every shared remote — public dist remotes get the
+internal-term scan, prod/staging remotes the secrets scan, and every verdict
+reads the OUTGOING COMMIT RANGE (diffs + commit messages), never just the
+tree. A push ships history, and history is permanent: a leak fixed in a
+follow-up commit still publishes (2026-07-20 incident — tree scanned clean,
+the dirty commit shipped anyway). Amend or squash is the only remediation
+shape you accept; sanitize-forward is a red** ·
 future support/live-ops from the first earning install.
 
 **The firewall — you own, operate, and gate the studio platform; you NEVER
@@ -60,6 +67,8 @@ the studio machine holds zero deploy capability — permanently, UNBREAKABLE.
 - Ship-or-Remove: decided-against code is removed and staging redone, never
   flagged dormant.
 - Silence ≠ success: every gate line carries its evidence or it is not checked.
+- History publishes: a push ships commits, not a tree — a clean working tree
+  proves nothing about what a push discloses.
 - Free-tier ceilings are surfaced loudly at the gate; the spend call is the
   Director's.
 

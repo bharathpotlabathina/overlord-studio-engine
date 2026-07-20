@@ -113,3 +113,74 @@ test('M4 tool-default vector: MCP config carrying a prod project ref -> fail; re
     JSON.stringify({ mcpServers: { supabase: { url: 'https://mcp.supabase.com/devref' } } }));
   assert.strictEqual(run(r, home).code, 0);
 });
+
+// The lockdown form: RLS enabled dynamically inside a DO
+// block, FOREACH over an array of table names. Static scan read it as absent —
+// 4 false positives on the first product run, all live-disproven 2026-07-20.
+test('RLS: lockdown form (DO block, FOREACH over ARRAY, dynamic ENABLE) counts as enabled', () => {
+  const { r, home } = newRepo(BASE);
+  fs.mkdirSync(path.join(r, 'migrations'));
+  fs.writeFileSync(path.join(r, 'migrations', '001_a.sql'),
+    'CREATE TABLE touchpoints (id int);\nCREATE TABLE candidate_timeline (id int);\n');
+  fs.writeFileSync(path.join(r, 'migrations', '002_lock.sql'), `
+DO $$
+DECLARE
+  t text;
+  pii_tables text[] := ARRAY['touchpoints', 'candidate_timeline'];
+BEGIN
+  FOREACH t IN ARRAY pii_tables LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY;', t);
+  END LOOP;
+END $$;
+`);
+  const res = run(r, home);
+  assert.strictEqual(res.code, 0, res.out);
+});
+
+test('RLS: a name in an ARRAY that never reaches a dynamic ENABLE is still a failure', () => {
+  const { r, home } = newRepo(BASE);
+  fs.mkdirSync(path.join(r, 'migrations'));
+  fs.writeFileSync(path.join(r, 'migrations', '001_a.sql'), `
+CREATE TABLE orders (id int);
+DO $$
+DECLARE
+  t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['orders'] LOOP
+    EXECUTE format('ANALYZE public.%I;', t);
+  END LOOP;
+END $$;
+`);
+  const bad = run(r, home);
+  assert.notStrictEqual(bad.code, 0);
+  assert.match(bad.out, /orders/i);
+});
+
+test('RLS: an ARRAY in a different block than the dynamic ENABLE does not cover', () => {
+  const { r, home } = newRepo(BASE);
+  fs.mkdirSync(path.join(r, 'migrations'));
+  fs.writeFileSync(path.join(r, 'migrations', '001_a.sql'), `
+CREATE TABLE orders (id int);
+CREATE TABLE users (id int);
+DO $$
+DECLARE
+  t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['users'] LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY;', t);
+  END LOOP;
+END $$;
+DO $$
+DECLARE
+  t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['orders'] LOOP
+    EXECUTE format('ANALYZE public.%I;', t);
+  END LOOP;
+END $$;
+`);
+  const bad = run(r, home);
+  assert.notStrictEqual(bad.code, 0);
+  assert.match(bad.out, /orders/i);
+  assert.doesNotMatch(bad.out, /users/i);
+});

@@ -11,3 +11,7 @@ Owner: Release Engineer.
 3. The composition record, release notes, rollback plan, and both certificates
    (quality, security) all carry the same version string. A document without the
    version string is not part of the release.
+4. **Plugin-class carve-out (Director-ruled 2026-07-20, at the engine's own
+   v0.1.3 gate):** products installed via a plugin manifest use plain semver
+   (`0.1.3`) — the manifest machinery keys on it — and tag `v<semver>`. The
+   R-scheme in 1–2 governs client/product releases. Rule 3 applies unchanged.

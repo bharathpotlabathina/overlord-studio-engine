@@ -34,6 +34,23 @@ function containsProdId(text, prodIds) {
   return prodIds.find((id) => text.includes(id));
 }
 
+// The "lockdown form": RLS enabled dynamically inside a DO block — EXECUTE
+// format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t) driven by FOREACH
+// over an array of table names. A literal-only scan reads that as absent (4 false
+// positives on the first product run, live-disproven 2026-07-20). Names are harvested
+// only from arrays in the *same* block as the dynamic ENABLE, so a table listed in
+// some unrelated block's array is not silently counted as covered.
+function lockdownCovered(corpus) {
+  const covered = new Set();
+  for (const [block] of corpus.matchAll(/\bDO\s+(\$\w*\$)[\s\S]*?END\s*\1/gi)) {
+    if (!/format\(\s*'ALTER TABLE[^']*%I[^']*ENABLE ROW LEVEL SECURITY/i.test(block)) continue;
+    for (const arr of block.matchAll(/ARRAY\s*\[([^\]]*)\]/gi)) {
+      for (const n of arr[1].matchAll(/'(\w+)'/g)) covered.add(n[1].toLowerCase());
+    }
+  }
+  return covered;
+}
+
 function main() {
   const root = process.cwd();
   const cfg = loadConfig(root);
@@ -62,10 +79,11 @@ function main() {
     const corpus = sqlFiles.map((f) => fs.readFileSync(path.join(abs, f), 'utf8')).join('\n');
     checked += 1;
     const created = [...corpus.matchAll(/CREATE TABLE (?:IF NOT EXISTS )?"?([\w.]+)"?/gi)].map((m) => m[1]);
+    const covered = lockdownCovered(corpus);
     for (const t of created) {
       const bare = t.split('.').pop();
       const rls = new RegExp(`ALTER TABLE (?:IF EXISTS )?"?(?:[\\w]+\\.)?${bare}"? ENABLE ROW LEVEL SECURITY`, 'i');
-      if (!rls.test(corpus)) failures.push(`${dir}: table "${t}" created without ENABLE ROW LEVEL SECURITY`);
+      if (!rls.test(corpus) && !covered.has(bare.toLowerCase())) failures.push(`${dir}: table "${t}" created without ENABLE ROW LEVEL SECURITY`);
     }
     checked += 1;
     // dupeCheck prints its own findings; capture via return code only.

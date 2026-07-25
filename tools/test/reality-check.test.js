@@ -82,3 +82,14 @@ test('CLI always exits 0, even with broken refs present', () => {
   const out = execFileSync('node', [path.join(__dirname, '..', 'reality-check.js'), v], { encoding: 'utf8' });
   assert.ok(out.includes('BROKEN'));
 });
+
+// a register path that exists but is a DIRECTORY (plausible user slip) must not crash
+// check() — loadRegister guards its read the same way profile.js guards its config read.
+test('a register that is a directory (not a file) does not crash check()', () => {
+  const v = fixtureVault();
+  fs.rmSync(path.join(v, '_claude', 'reality-check-ignore.txt'));
+  fs.mkdirSync(path.join(v, '_claude', 'reality-check-ignore.txt'));
+  assert.doesNotThrow(() => check(v));
+  const r = check(v);
+  assert.ok(r.broken.includes('setup/ghost.sh'), 'unreadable ignore register treated as empty, ref still reported');
+});

@@ -23,8 +23,12 @@ const REF_RE = /`(_claude|docs|setup|Projects|sot|sessions|wiki)\/[A-Za-z0-9 ._/
 const DATED_PATH_RE = /(^|\/)\d{4}-\d{2}-\d{2}/;
 
 function loadRegister(file) {
-  if (!fs.existsSync(file)) return [];
-  return fs.readFileSync(file, 'utf8').split('\n')
+  let content;
+  // register path may exist but not be a readable file (directory, permissions, etc.
+  // — a plausible user slip); same guard shape as profile.js's config read. Single
+  // guard here covers every caller (doctor, CLI) rather than wrapping each call site.
+  try { content = fs.readFileSync(file, 'utf8'); } catch { return []; }
+  return content.split('\n')
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith('#'));
 }

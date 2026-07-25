@@ -215,3 +215,15 @@ test('doctor reports reality-check broken count, and it never fails the run', ()
   assert.strictEqual(r.code, 0);
   assert.match(r.out, /reality-check: \d+ broken/);
 });
+
+// CRITICAL fixup: a reality-check register that exists as a DIRECTORY (plausible user
+// slip) must not crash the whole doctor run — mirrors the profile row's try/catch survival.
+test('reality-check register as a directory does not crash the doctor run', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  fs.mkdirSync(path.join(root, '_claude', 'reality-check-ignore.txt'), { recursive: true });
+  const r = run(root);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: \d+ broken/);
+  assert.match(r.out, /checked 0, found 0 green/);
+});

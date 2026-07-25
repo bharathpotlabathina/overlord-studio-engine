@@ -30,6 +30,13 @@ Runs on **macOS, Linux, and Windows** — the runtime is Node (which Claude Code
 /plugin install overlord-studio-engine@overlord-studio-engine
 ```
 
+No marketplace access (offline / local clone)? The setup skill's underlying command works directly:
+
+```
+node <clone-path>/tools/studio-setup.js all <your-vault-path>
+```
+```
+
 (Working from a local clone? `/plugin marketplace add /path/to/your/clone` works the same way.)
 
 Then set the **`vault_path`** config when prompted (or point it at an existing vault), and run first-time setup:
@@ -51,7 +58,7 @@ node --test tools/test/*.test.js    # the full engine test suite
 node tools/doctor.js                # the wiring registry health check
 ```
 
-Both must come back clean (suite all-pass; doctor reports every mechanism green).
+Both must come back clean (suite all-pass; doctor reports every mechanism green). Two doctor lines are informational, not mechanisms: `profile:` and `reality-check:` — they never turn the run red; a nonzero reality-check count is a docs-drift finding to triage, not an install failure.
 
 ## What this costs to run
 

@@ -23,10 +23,22 @@ Do the following in order:
    If no files changed or scope is unclear, skip and note it.
 
 2. **Write session handoff card.**
-   Write `_claude/HANDOFF.md` in the vault root (`{{VAULT}}/_claude/HANDOFF.md`). Overwrite any previous version. Format:
+   Write `_claude/HANDOFF.md` in the vault root (`{{VAULT}}/_claude/HANDOFF.md`). **Re-read the
+   current file FIRST — it may have changed since session start (parallel sessions on one vault
+   are normal; a card written from a stale snapshot silently resurrects finished work).** Then:
+
+   - **Prepend your card at the top.** If the file holds a card from a DIFFERENT session, keep
+     it below yours, intact — never delete, merge, or rewrite another session's card, and never
+     copy its pending items into your own card (their card already says it; a copy goes stale).
+   - **Keep at most the 2 most recent cards**; drop older ones (history belongs in
+     `_claude/session-log.md`).
+   - A card whose items YOUR session resolved may be annotated in place (strikethrough + "done")
+     — that is correcting stale state, not rewriting their card.
+
+   Card format:
 
    ```markdown
-   # Session Handoff — <YYYY-MM-DD>
+   # Session Handoff — <YYYY-MM-DD> (<short session slug>)
 
    ## Summary
    <One paragraph: what was worked on and what state it's in.>
@@ -43,7 +55,9 @@ Do the following in order:
    - <bullet, or "None">
    ```
 
-   This is the restore card and the state of record. Keep it a card, not a log: overwrite it, never append. If it is growing, the history belongs in `_claude/session-log.md`.
+   This is the restore card and the state of record. Keep it a card stack, not a log: at most
+   two cards, newest on top. A second card below yours means a parallel session closed recently —
+   whoever resumes reads both.
 
 3. **Update active context.**
    - If any new preferences, decisions, or project facts were established, write them to the appropriate memory file and update MEMORY.md.

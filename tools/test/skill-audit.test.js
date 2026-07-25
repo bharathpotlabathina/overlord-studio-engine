@@ -74,6 +74,22 @@ test('window starts after the LAST boundary marker (prior-session skills exclude
   assert.match(r.out, /verification-before-completion — not fired/);
 });
 
+test('a trailing logout marker (the closing ritual itself) must not empty the window', () => {
+  // I-97 defect 1, surviving the Node rebuild in a different form: when the /logout ritual
+  // logs its marker BEFORE this audit runs, that marker is the log's final line. Treating it
+  // as the session boundary empties the window at exactly the moment the audit matters most,
+  // producing a false "(none)" flag against a session that fired skills all day.
+  const v = newVault([
+    '2026-07-19T01:00:00 | logout',
+    '2026-07-19T02:00:00 | superpowers:verification-before-completion',
+    '2026-07-19T03:00:00 | logout',
+  ]);
+  const r = runAudit(v);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /audited 1 skill invocation this session/);
+  assert.match(r.out, /\[x\] verification-before-completion/);
+});
+
 test('no log file at all -> explicit nothing-to-report, exit 0 (cold install)', () => {
   const v = newVault(null);
   const r = runAudit(v);

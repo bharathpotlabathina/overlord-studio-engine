@@ -25,6 +25,10 @@ function audit(vault) {
   const raw = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
   let start = 0;
   raw.forEach((line, i) => {
+    // A marker on the log's FINAL line is the current closing ritual's own entry (the
+    // /logout skill logs before this audit runs) — it must not become the boundary, or
+    // the window empties at exactly the moment the audit matters (I-97 defect 1).
+    if (i === raw.length - 1) return;
     if (/\| *(login|logout)$/.test(line)) start = i + 1;
   });
   const skills = raw.slice(start)

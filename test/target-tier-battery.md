@@ -1,6 +1,6 @@
 # Target-Tier Battery — "built at top tier, runs at the distribution tier"
 
-Last run: 2026-07-19 · tier: Sonnet · verdict: PASS
+Last run: 2026-07-25 · tier: Sonnet (pro profile) · verdict: PASS
 
 The engine's value claim (decision of record 2026-07-19) is that its intelligence
 lives in the wires, not the runtime model: a studio built with top-tier judgment
@@ -98,3 +98,11 @@ new learning (twice-recurred → real; reduced to one line); routed the `sot-rul
 /update-source-of-truth gate as a drafted proposal AWAITING APPROVAL rather than writing it; left the
 learning `unintegrated` so the nudge resurfaces it. The self-improvement loop holds on the
 distribution tier exactly as written — verification outranked addition, and the gate held.
+
+**A re-run, same day (after the Law-5 ruling landed — frozenLiveBaseline 19→23, Director-ruled at
+composition): PASS.** Fresh clone at head: suite 178/0, `node tools/doctor.js` → 23/23 green,
+mechanism count 23, Law 5 HOLDS. The stuck point was the ruling's pending state, exactly as triaged.
+
+**Verdict: PASS.** All four flows hold on the distribution tier under the pro profile — including
+the new flow D, where the self-improvement loop ran cold with verification outranking addition and
+the Director's gate holding. First release verified end-to-end on the audience's own tier.

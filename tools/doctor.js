@@ -119,6 +119,12 @@ function runDoctor(root) {
   if (staleness.stale) ok = false;
   lines.push(staleness.line);
 
+  // Active plan profile (v0.2.0 M1) — informational only: pro and max are both
+  // valid states, so this row can never turn the run red. Built-in like
+  // install-staleness above, not a registered mechanism (Law-5 ceiling).
+  const { resolveProfile } = require('./profile.js');
+  lines.push(`profile: ${resolveProfile(root)}`);
+
   lines.push(`checked ${mechanisms.length}, found ${greenCount} green`);
   lines.push(`mechanism count: ${mechanisms.length}`);
   return { ok, lines };

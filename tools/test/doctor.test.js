@@ -193,3 +193,14 @@ test('root outside the plugins cache (dev checkout) -> explicit N/A, stays green
   assert.strictEqual(r.code, 0);
   assert.match(r.out, /install-staleness: N\/A/);
 });
+
+// --- active plan profile row (v0.2.0 M1: doctor surfaces resolveProfile's answer,
+// green informational — pro and max are both valid, a profile can never be red).
+
+test('doctor reports the active plan profile', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const r = run(root);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /profile: (pro|max)/);
+});

@@ -18,14 +18,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { resolveVault } = require('./platform.js');
 
+// The engine's own location is knowable without touching the invoking process's cwd
+// (or that cwd's git repo, which may not be the engine at all — e.g. a user vault).
+// STUDIO_ROOT wins when set (tests, alternate installs); otherwise self-anchor.
 function repoRoot() {
-  if (process.env.STUDIO_ROOT) return process.env.STUDIO_ROOT;
-  try {
-    return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
-  } catch {
-    return process.cwd();
-  }
+  return process.env.STUDIO_ROOT || path.resolve(__dirname, '..');
 }
 
 function listFiles(dir) {
@@ -72,7 +71,7 @@ function installStaleness(root, pluginsDir) {
   }
 }
 
-function runDoctor(root) {
+function runDoctor(root, vault) {
   const registryPath = path.join(root, 'tools', 'registry.json');
   const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
   const mechanisms = registry.mechanisms || [];
@@ -119,6 +118,32 @@ function runDoctor(root) {
   if (staleness.stale) ok = false;
   lines.push(staleness.line);
 
+  // Active plan profile (v0.2.0 M1) — informational row (registered as a
+  // mechanism; never turns the run red): pro and max are both valid states.
+  // Target is the resolved VAULT, same reasoning as reality-check below —
+  // the engine root has no .studio-config, so reading root always fell back
+  // to pro regardless of the vault's real setting.
+  const { resolveProfile } = require('./profile.js');
+  lines.push(`profile: ${resolveProfile(vault)}`);
+
+  // reality-check row (v0.2.0 M3) — informational only, same law as profile above:
+  // report-only forever, this row can never turn the run red. Target is the resolved
+  // VAULT, not the engine root: the row's semantic target is the user's vault docs,
+  // never the engine's own (which legitimately reference vault-only paths that would
+  // otherwise all read as false "broken"). Crash-isolated like the rest of this file.
+  let realityLine;
+  try {
+    if (vault) {
+      const { check: realityCheck } = require('./reality-check.js');
+      realityLine = `reality-check: ${realityCheck(vault).broken.length} broken`;
+    } else {
+      realityLine = 'reality-check: no vault configured (skipped)';
+    }
+  } catch (e) {
+    realityLine = `reality-check: crashed (${(e.message || e).toString().slice(0, 120)})`;
+  }
+  lines.push(realityLine);
+
   lines.push(`checked ${mechanisms.length}, found ${greenCount} green`);
   lines.push(`mechanism count: ${mechanisms.length}`);
   return { ok, lines };
@@ -126,7 +151,10 @@ function runDoctor(root) {
 
 if (require.main === module) {
   const root = repoRoot();
-  const { ok, lines } = runDoctor(root);
+  // argv[2] is an optional vault-path override, same convention as reality-check.js
+  // and skill-audit.js's own CLIs — resolveVault falls through to env/settings.json.
+  const vault = resolveVault(process.argv[2]);
+  const { ok, lines } = runDoctor(root, vault);
   console.log(lines.join('\n'));
   process.exit(ok ? 0 : 1);
 }

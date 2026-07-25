@@ -1,6 +1,6 @@
 # Overlord Studio Engine
 
-v0.1.3 · by Bharath Potlabathina
+v0.2.0 · by Bharath Potlabathina
 
 A structured **studio engine** for Claude Code: a team of role-based personas, a shared methodology (planning → build → QA → verification), and the machinery to skin them to a theme of your choosing — all wired to **your own vault** of memory, projects, and context.
 
@@ -30,6 +30,12 @@ Runs on **macOS, Linux, and Windows** — the runtime is Node (which Claude Code
 /plugin install overlord-studio-engine@overlord-studio-engine
 ```
 
+No marketplace access (offline / local clone)? The setup skill's underlying command works directly:
+
+```
+node <clone-path>/tools/studio-setup.js all <your-vault-path>
+```
+
 (Working from a local clone? `/plugin marketplace add /path/to/your/clone` works the same way.)
 
 Then set the **`vault_path`** config when prompted (or point it at an existing vault), and run first-time setup:
@@ -40,7 +46,7 @@ Then set the **`vault_path`** config when prompted (or point it at an existing v
 
 `/studio-setup` scaffolds the vault, links memory into `~/.claude`, points git hooks at the plugin, prints a permissions allow-list to paste, and runs the **Flavour** first-time-user funnel. It's idempotent — safe to re-run; the session-start wiring re-runs the heal automatically each session, and `/login` re-runs it on demand.
 
-> The first run is prompt-heavy (each setup step is permission-prompted) until you paste the allow-list from Step 4. After that, sessions are quiet.
+> The first run is prompt-heavy (each setup step is permission-prompted) until you paste the allow-list from Step 5. After that, sessions are quiet.
 
 ### Verify your install
 
@@ -51,11 +57,17 @@ node --test tools/test/*.test.js    # the full engine test suite
 node tools/doctor.js                # the wiring registry health check
 ```
 
-Both must come back clean (suite all-pass; doctor reports every mechanism green).
+Both must come back clean (suite all-pass; doctor reports every mechanism green). Two doctor lines are informational, not mechanisms: `profile:` and `reality-check:` — they never turn the run red; a nonzero reality-check count is a docs-drift finding to triage, not an install failure.
+
+## What this costs to run
+
+Every role runs on **Sonnet** by default — the `pro` profile, safe for any Claude plan, never leaves it.
+
+Opt into the `max` profile (`profile=max` in `_claude/.studio-config`) and two things escalate: planning (Systems) and security certification (Security) dispatch to **Opus** — a handful of calls per project, not a standing cost — and the mandatory final whole-branch review escalates to **Fable** when it's available on your plan. Everything else, on either profile, stays on Sonnet.
 
 ## Flavour — the theming layer
 
-Instead of shipping a fixed persona, the engine generates yours. The FTUE funnel walks **flavour? → genre → universe → faction**, then produces an honorific, a mood, role names, and light thematic language. Reverence toward you (the studio director) is always on; everything else is yours to pick.
+Instead of shipping a fixed persona, the engine generates yours. The FTUE funnel walks **flavour? → genre → universe → faction → relationship register**, then produces an honorific, a mood, role names, light thematic language, and how the team regards you. You choose the register from five options — Sovereign, Council, Crew, Mentor, or Straight (plain professional, no theater) — nothing is hardcoded; skip the question and it defaults to Council.
 
 - `/flavour` — view, switch, rename, or turn Flavour off (drops to a neutral/professional skin).
 - Decline the funnel and the studio runs neutral out of the box.
@@ -79,7 +91,7 @@ Summon any role for deep interactive work; the orchestrator dispatches bounded w
 | `/summon-release` | Release engineering — environments, release composition; gates production |
 | `/summon-security` | Security engineering — security certificates feed every go/no-go |
 
-Other commands: `/login` · `/logout` · `/flavour` · `/project-health` · `/context-budget` · `/silent-failure-hunter` · `/atlas-propose` · `/atlas-map-review` · `/update-source-of-truth`.
+Other commands: `/login` · `/logout` · `/flavour` · `/project-health` · `/context-budget` · `/silent-failure-hunter` · `/atlas-propose` · `/atlas-map-review` · `/update-source-of-truth` · `/retro-integrate`.
 
 ## Structure
 

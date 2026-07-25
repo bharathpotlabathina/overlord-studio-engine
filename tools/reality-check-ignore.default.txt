@@ -1,0 +1,8 @@
+# reality-check ignore register — REAL NOISE only (bare filenames quoted as examples,
+# format templates, placeholder paths). One pattern per line; matches by prefix or exact
+# (shell glob semantics: `pat` or `pat`*). For paths that are DECLARED but intentionally
+# not yet built, use reality-aspirational.txt instead — they get their own report
+# section, not silence.
+#
+# example: a literal placeholder path used in doc prose, not a real ref
+# docs/example/<placeholder>

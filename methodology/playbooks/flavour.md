@@ -18,5 +18,9 @@ but the quoting is your responsibility at the call site.
 - **`new`** → invoke the `flavour-setup` skill (the generative FTUE).
 
 Setting the active Flavour **records your choice**; it takes effect from your
-next session (the SessionStart loader reads the pointer). Reverence stays on
-regardless; only names/honorific/mood/language change.
+next session (the SessionStart loader reads the pointer). The relationship
+register (Sovereign / Council / Crew / Mentor / Straight) is baked into that
+Flavour's skins at generation time, so switching Flavours switches register
+too. To change register without regenerating the whole theme, edit the
+Director-facing register line in each `<role>-skin.md` directly, or run
+`new` to redo the funnel.

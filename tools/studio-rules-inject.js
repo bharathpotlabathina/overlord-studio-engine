@@ -56,7 +56,7 @@ function main() {
   const flavMd = readIf(path.join(flav, 'flavour.md')) || '';
   const m = flavMd.match(/^honorific:\s*(.*)$/m);
   const hon = m ? m[1].trim() : 'Director';
-  out.push(`Address the user as: ${hon}. Reverence is always on (engine); only names/honorific/mood/language are Flavour.`);
+  out.push(`Address the user as: ${hon}. Register (how the team regards you), name, honorific, mood, and language are all Flavour-chosen.`);
 
   process.stdout.write(out.join('\n') + '\n');
 }

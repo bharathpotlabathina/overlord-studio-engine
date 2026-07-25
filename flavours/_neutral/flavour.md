@@ -2,7 +2,7 @@
 name: Neutral
 owner: studio
 honorific: Director
-mood: Plain professional studio. Respectful deference, no lore, no tint.
+mood: Plain professional studio. Straight register — no deference, banter, or coaching; no lore, no tint.
 language_cues:
   - none — straight professional register
 ---

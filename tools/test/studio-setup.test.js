@@ -59,6 +59,65 @@ test('scaffold defaults autosync to OFF — a fresh vault never auto-pushes', ()
   assert.doesNotMatch(cfg, /^autosync=on$/m);
 });
 
+test('scaffold defaults profile to pro — the safe default plan tier', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const cfg = fs.readFileSync(path.join(vault, '_claude/.studio-config'), 'utf8');
+  assert.match(cfg, /^profile=pro$/m, 'profile must default to pro in a scaffolded vault');
+  assert.doesNotMatch(cfg, /^profile=max$/m);
+});
+
+// --- reality-check registers (v0.2.0 M3: scaffold seeds the two vault-homed
+// registers from the plugin's .default.txt files, idempotent like the rest of scaffold).
+
+test('scaffold seeds the reality-check registers', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.ok(fs.existsSync(path.join(vault, '_claude/reality-check-ignore.txt')));
+  assert.ok(fs.existsSync(path.join(vault, '_claude/reality-aspirational.txt')));
+
+  // Idempotent: don't clobber a vault's own edits.
+  fs.writeFileSync(path.join(vault, '_claude/reality-check-ignore.txt'), 'CUSTOM\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(path.join(vault, '_claude/reality-check-ignore.txt'), 'utf8'), /CUSTOM/);
+});
+
+// --- retro log (v0.2.0 M3: scaffold seeds the format template so the nudge and
+// /retro-integrate have something real to read on a fresh vault).
+
+test('scaffold seeds the retro-log template with the Signals/Claim entry format', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const p = path.join(vault, '_claude/retros/retro-log.md');
+  assert.ok(fs.existsSync(p));
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text, /Signals:/);
+  assert.match(text, /Claim:/);
+
+  // Idempotent: don't clobber a vault's own entries.
+  fs.writeFileSync(p, 'CUSTOM ENTRY\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(p, 'utf8'), /CUSTOM ENTRY/);
+});
+
+// --- goals template (v0.2.0 M3: scaffold seeds the goals-file contract so the
+// retro loop's "better, against what" question has a real file to point at).
+
+test('scaffold seeds the goals template with the NOT-this contract and <replace> placeholders', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const p = path.join(vault, '_claude/studio-goals.md');
+  assert.ok(fs.existsSync(p));
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text, /NOT this/);
+  assert.match(text, /<replace/);
+
+  // Idempotent: don't clobber a vault's own goals.
+  fs.writeFileSync(p, 'CUSTOM GOALS\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(p, 'utf8'), /CUSTOM GOALS/);
+});
+
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {
   const vault = path.join(tmp(), 'v');
   execFileSync('node', [SETUP, 'scaffold', vault]);

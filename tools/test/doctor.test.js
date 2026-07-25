@@ -47,10 +47,13 @@ function writeRegistry(root, mechanisms, wiringRoots) {
   );
 }
 
+// HOME is isolated to a nonexistent dir so resolveVault()'s settings.json fallback
+// can never leak the real machine's configured vault into a test run (this repo's
+// own ~/.claude/settings.json points at a real vault_path) — tests stay hermetic.
 function run(root, ...args) {
   try {
     const out = execFileSync('node', [SCRIPT, ...args], {
-      env: { ...process.env, STUDIO_ROOT: root }, encoding: 'utf8',
+      env: { ...process.env, STUDIO_ROOT: root, HOME: '/nonexistent-doctor-test-home' }, encoding: 'utf8',
     });
     return { code: 0, out: out.trim() };
   } catch (e) {
@@ -156,7 +159,7 @@ function newCacheInstall(pluginsDir, mkt, name, version) {
 function runWithPlugins(root, pluginsDir) {
   try {
     const out = execFileSync('node', [SCRIPT], {
-      env: { ...process.env, STUDIO_ROOT: root, STUDIO_PLUGINS_DIR: pluginsDir }, encoding: 'utf8',
+      env: { ...process.env, STUDIO_ROOT: root, STUDIO_PLUGINS_DIR: pluginsDir, HOME: '/nonexistent-doctor-test-home' }, encoding: 'utf8',
     });
     return { code: 0, out: out.trim() };
   } catch (e) {
@@ -192,4 +195,102 @@ test('root outside the plugins cache (dev checkout) -> explicit N/A, stays green
   const r = runWithPlugins(root, pluginsDir);
   assert.strictEqual(r.code, 0);
   assert.match(r.out, /install-staleness: N\/A/);
+});
+
+// --- active plan profile row (v0.2.0 M1: doctor surfaces resolveProfile's answer,
+// green informational — pro and max are both valid, a profile can never be red).
+
+test('doctor reports the active plan profile', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const r = run(root);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /profile: (pro|max)/);
+});
+
+// Reproduces the final-review CRITICAL: the profile row must read the VAULT's
+// .studio-config, not the engine root's (which has none, so it always fell back
+// to pro regardless of the vault's real setting).
+test('doctor profile row reads the resolved vault, not the engine root', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const vault = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-vault-'));
+  fs.mkdirSync(path.join(vault, '_claude'), { recursive: true });
+  fs.writeFileSync(path.join(vault, '_claude', '.studio-config'), 'profile=max\n');
+  const r = run(root, vault);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /profile: max/);
+});
+
+// --- reality-check row (v0.2.0 M3: informational, report-only law — this row can
+// never turn the run red, same shape as the profile row above).
+
+test('doctor reports reality-check broken count against a resolved vault, and it never fails the run', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const vault = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-vault-'));
+  const r = run(root, vault);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: \d+ broken/);
+});
+
+test('no vault resolves -> reality-check row says so explicitly, still never fails the run', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const r = run(root); // no vault arg, HOME isolated -> resolveVault() finds nothing
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: no vault configured \(skipped\)/);
+});
+
+// CRITICAL fixup: a reality-check register that exists as a DIRECTORY (plausible user
+// slip) must not crash the whole doctor run — mirrors the profile row's try/catch survival.
+test('reality-check register as a directory (in the vault) does not crash the doctor run', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const vault = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-vault-'));
+  fs.mkdirSync(path.join(vault, '_claude', 'reality-check-ignore.txt'), { recursive: true });
+  const r = run(root, vault);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: \d+ broken/);
+  assert.match(r.out, /checked 0, found 0 green/);
+});
+
+// --- defect 1: doctor CLI must self-anchor to the engine's own location, never the
+// invoking process's cwd-git-toplevel. A user running `node tools/doctor.js` (or a
+// wired hook) from inside an unrelated git repo (e.g. their vault) must get normal
+// output against the ENGINE's registry, not an ENOENT crash from a foreign cwd.
+test('CLI does not crash when invoked from a non-engine git cwd (defect 1)', () => {
+  const foreignRepo = fs.mkdtempSync(path.join(os.tmpdir(), 'foreign-git-'));
+  execFileSync('git', ['init', '-q'], { cwd: foreignRepo });
+  const env = { ...process.env, HOME: '/nonexistent-doctor-test-home' };
+  delete env.STUDIO_ROOT; // must NOT rely on STUDIO_ROOT — self-anchor without it
+  let result;
+  try {
+    result = { code: 0, out: execFileSync('node', [SCRIPT], { cwd: foreignRepo, encoding: 'utf8', env }).toString() };
+  } catch (e) {
+    result = { code: e.status, out: (e.stdout || '').toString(), err: (e.stderr || '').toString() };
+  }
+  assert.ok(!/ENOENT/.test(result.err || ''), `must not crash on the foreign repo's missing tools/registry.json: ${result.err}`);
+  assert.match(result.out, /mechanism count: \d+/);
+});
+
+// --- defect 2: the reality-check row must target the RESOLVED VAULT, never the engine
+// root — the engine's own docs can reference vault-only paths that are never "broken".
+test('reality-check row targets the resolved vault, not the engine root (defect 2)', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  fs.writeFileSync(path.join(root, 'BROKEN.md'), 'Ref: `_claude/does-not-exist.md`\n');
+  execFileSync('git', ['-C', root, 'add', '-A']);
+
+  const vault = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-vault-'));
+  fs.mkdirSync(path.join(vault, '_claude'), { recursive: true });
+  execFileSync('git', ['init', '-q'], { cwd: vault });
+  fs.writeFileSync(path.join(vault, '_claude', 'README.md'), 'x\n');
+  fs.writeFileSync(path.join(vault, 'README.md'), 'All good, `_claude/README.md` exists.\n');
+  execFileSync('git', ['-C', vault, 'add', '-A']);
+
+  const r = run(root, vault);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: 0 broken/); // not the engine root's broken ref
 });

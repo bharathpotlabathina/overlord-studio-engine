@@ -1,0 +1,8 @@
+# reality-check aspirational register — paths DECLARED in docs but intentionally not yet
+# instantiated. These report under "DECLARED, NOT YET INSTANTIATED" instead of BROKEN — so
+# they don't cry wolf forever, but also never silently vanish from view. Prefix match
+# (shell glob semantics: `pat` or `pat`*).
+sot/
+sessions/
+wiki/
+_claude/wiki/

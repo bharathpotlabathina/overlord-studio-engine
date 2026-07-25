@@ -100,6 +100,24 @@ test('scaffold seeds the retro-log template with the Signals/Claim entry format'
   assert.match(fs.readFileSync(p, 'utf8'), /CUSTOM ENTRY/);
 });
 
+// --- goals template (v0.2.0 M3: scaffold seeds the goals-file contract so the
+// retro loop's "better, against what" question has a real file to point at).
+
+test('scaffold seeds the goals template with the NOT-this contract and <replace> placeholders', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const p = path.join(vault, '_claude/studio-goals.md');
+  assert.ok(fs.existsSync(p));
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text, /NOT this/);
+  assert.match(text, /<replace/);
+
+  // Idempotent: don't clobber a vault's own goals.
+  fs.writeFileSync(p, 'CUSTOM GOALS\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(p, 'utf8'), /CUSTOM GOALS/);
+});
+
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {
   const vault = path.join(tmp(), 'v');
   execFileSync('node', [SETUP, 'scaffold', vault]);

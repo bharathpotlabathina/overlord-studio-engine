@@ -64,6 +64,40 @@ verdicts get checked against. \`?\` is honest.
 ---
 `;
 
+// Goals template (v0.2.0 M3): the decision filter the retro loop measures
+// "better" against. A vault without this ships the loop blind — see Task 10.
+// Header states the contract; body is placeholder G1/G2 for the Director to
+// replace at phase-open. Never appended to by tooling — Director-owned content.
+const STUDIO_GOALS_SEED = `# Studio Goals — the focus filter
+
+**What this is:** a decision filter, not a tracker. Before taking on work, ask
+*"which current goal does this serve?"* No goal -> **kill it or park it with a
+trigger**, unless the Director explicitly overrides. The Orchestrator enforces
+this in conversation.
+
+**Rules:** 3-5 goals, hard cap · the Director sets and retires them ·
+phase-scoped, reset at the phase boundary · each goal carries its **NOT this**
+(the anti-scope is the teeth).
+
+> Not injected into always-loaded context — the Orchestrator reads this on
+> demand when a work-decision is on the table.
+
+---
+
+## Current phase — <replace: phase name> (set <replace: date>)
+
+### G1 · <replace: the current phase's primary goal>
+- **Exit test:** <replace: a wired check, not a feeling>
+- **NOT this:** <replace: the anti-scope that gives this goal teeth>
+
+### G2 · <replace: the current phase's secondary goal, or delete if only one applies>
+- **Exit test:** <replace: a wired check, not a feeling>
+- **NOT this:** <replace: the anti-scope that gives this goal teeth>
+
+*Phase set <replace: date>. Retire/reset at the next phase boundary — an exit
+test passing, or the Director's call.*
+`;
+
 // Vault-level switches, read by the tools. Defaults are the safe ones.
 // KILLED 2026-07-15: `personas=on`. It was the CAP-025 persona-vs-role-generic
 // toggle (2026-07-06) and the flavour system superseded it nine days later —
@@ -96,6 +130,7 @@ function scaffold(V) {
   }
   ensureFile(path.join(V, '_claude/memory/MEMORY.md'), '# Memory Index\n');
   ensureFile(path.join(V, '_claude/retros/retro-log.md'), RETRO_LOG_SEED);
+  ensureFile(path.join(V, '_claude/studio-goals.md'), STUDIO_GOALS_SEED);
   ensureFile(path.join(V, '_claude/studio-atlas-map.json'), EMPTY_MAP);
   for (const f of ['backlog.md', 'session-log.md', 'studio-brief.md']) {
     ensureFile(path.join(V, '_claude', f), `# ${f.replace(/\.md$/, '')}\n`);

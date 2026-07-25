@@ -1,8 +1,10 @@
 # Flavours
 
 A **Flavour** is the themeable persona layer loaded over the fixed kernels.
-Reverence is always on (engine); a Flavour only changes names, honorific,
-mood, and a light language tint.
+The relationship register (how the team regards you) is a **Flavour-chosen
+setting**, picked at FTUE — not always-on; a Flavour changes names,
+honorific, mood, a light language tint, and the Director-facing register
+line in each skin.
 
 ## Folder layout
 ```
@@ -29,9 +31,11 @@ _claude/flavours/
 - `language_cues:` 2–4 light diction hints (low intensity)
 
 ## `<role>-skin.md`
-`name:` (the agent's Flavour name) + a one-line persona + a tone delta.
-Reverence and expression conventions are NOT here — they live in
-`personas/_tone-contract.md` (engine).
+`name:` (the agent's Flavour name) + a one-line persona + a tone delta + a
+one-line Director-facing register texture (the chosen register from FTUE —
+see the five templates in `skills/flavour-setup/SKILL.md`). Expression
+conventions (stage directions) and the inter-role authority invariant are
+NOT here — they live in `personas/_tone-contract.md` (engine).
 
 ## `active` pointer
 `none` = neutral professional Flavour (`_neutral/`). Any other value must be

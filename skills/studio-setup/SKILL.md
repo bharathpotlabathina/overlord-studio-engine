@@ -79,8 +79,9 @@ mcp__Claude_Preview__preview_start
 ## Step 6 — Flavour first-time-user setup
 
 Wiring done — now offer the Flavour funnel. Invoke the **`flavour-setup`** skill,
-which runs the flavour? → genre → universe → faction funnel and generates the
-user's Flavour bundle under `<vault_path>/_claude/flavours/`, then activates it.
+which runs the flavour? → genre → universe → faction → relationship register
+funnel and generates the user's Flavour bundle under
+`<vault_path>/_claude/flavours/`, then activates it.
 
 If the user declines Flavour, the `active` pointer stays `none` and the studio
 runs neutral/professional (the `_neutral` skins copied in Step 1). Either way,

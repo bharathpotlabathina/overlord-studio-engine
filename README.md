@@ -61,7 +61,7 @@ Opt into the `max` profile (`profile=max` in `_claude/.studio-config`) and two t
 
 ## Flavour — the theming layer
 
-Instead of shipping a fixed persona, the engine generates yours. The FTUE funnel walks **flavour? → genre → universe → faction**, then produces an honorific, a mood, role names, and light thematic language. Reverence toward you (the studio director) is always on; everything else is yours to pick.
+Instead of shipping a fixed persona, the engine generates yours. The FTUE funnel walks **flavour? → genre → universe → faction → relationship register**, then produces an honorific, a mood, role names, light thematic language, and how the team regards you. You choose the register from five options — Sovereign, Council, Crew, Mentor, or Straight (plain professional, no theater) — nothing is hardcoded; skip the question and it defaults to Council.
 
 - `/flavour` — view, switch, rename, or turn Flavour off (drops to a neutral/professional skin).
 - Decline the funnel and the studio runs neutral out of the box.

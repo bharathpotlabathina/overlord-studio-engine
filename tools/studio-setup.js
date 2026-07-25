@@ -93,6 +93,11 @@ function scaffold(V) {
   const neutralDst = path.join(V, '_claude/flavours/_neutral');
   if (!fs.existsSync(neutralDst)) fs.cpSync(path.join(PLUGIN, 'flavours/_neutral'), neutralDst, { recursive: true });
   ensureFile(path.join(V, '_claude/flavours/active'), 'none\n');
+  // reality-check registers: vault-homed so users maintain them themselves (tools/reality-check.js).
+  ensureFile(path.join(V, '_claude/reality-check-ignore.txt'),
+    fs.readFileSync(path.join(PLUGIN, 'tools/reality-check-ignore.default.txt'), 'utf8'));
+  ensureFile(path.join(V, '_claude/reality-aspirational.txt'),
+    fs.readFileSync(path.join(PLUGIN, 'tools/reality-aspirational.default.txt'), 'utf8'));
   if (!isGitRepo(V)) { try { execFileSync('git', ['-C', V, 'init'], { stdio: 'ignore' }); } catch { /* ignore */ } }
   console.log(`scaffolded vault at ${V}`);
 }

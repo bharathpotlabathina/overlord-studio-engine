@@ -204,3 +204,14 @@ test('doctor reports the active plan profile', () => {
   assert.strictEqual(r.code, 0);
   assert.match(r.out, /profile: (pro|max)/);
 });
+
+// --- reality-check row (v0.2.0 M3: informational, report-only law — this row can
+// never turn the run red, same shape as the profile row above).
+
+test('doctor reports reality-check broken count, and it never fails the run', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const r = run(root);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /reality-check: \d+ broken/);
+});

@@ -67,6 +67,21 @@ test('scaffold defaults profile to pro — the safe default plan tier', () => {
   assert.doesNotMatch(cfg, /^profile=max$/m);
 });
 
+// --- reality-check registers (v0.2.0 M3: scaffold seeds the two vault-homed
+// registers from the plugin's .default.txt files, idempotent like the rest of scaffold).
+
+test('scaffold seeds the reality-check registers', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.ok(fs.existsSync(path.join(vault, '_claude/reality-check-ignore.txt')));
+  assert.ok(fs.existsSync(path.join(vault, '_claude/reality-aspirational.txt')));
+
+  // Idempotent: don't clobber a vault's own edits.
+  fs.writeFileSync(path.join(vault, '_claude/reality-check-ignore.txt'), 'CUSTOM\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(path.join(vault, '_claude/reality-check-ignore.txt'), 'utf8'), /CUSTOM/);
+});
+
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {
   const vault = path.join(tmp(), 'v');
   execFileSync('node', [SETUP, 'scaffold', vault]);

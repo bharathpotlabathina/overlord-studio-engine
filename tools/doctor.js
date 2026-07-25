@@ -125,6 +125,11 @@ function runDoctor(root) {
   const { resolveProfile } = require('./profile.js');
   lines.push(`profile: ${resolveProfile(root)}`);
 
+  // reality-check row (v0.2.0 M3) — informational only, same law as profile above:
+  // report-only forever, this row can never turn the run red.
+  const { check: realityCheck } = require('./reality-check.js');
+  lines.push(`reality-check: ${realityCheck(root).broken.length} broken`);
+
   lines.push(`checked ${mechanisms.length}, found ${greenCount} green`);
   lines.push(`mechanism count: ${mechanisms.length}`);
   return { ok, lines };

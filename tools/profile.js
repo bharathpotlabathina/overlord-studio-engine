@@ -12,10 +12,15 @@ const TABLES = {
   pro: { local: 'local', cheap: 'haiku', standard: 'sonnet', deep: 'sonnet', top: 'sonnet' },
 };
 
+// Load-bearing literal: preflight's config-key wiring check (tools/preflight.js
+// checkConfigWired) greps tools/*.js for a quoted 'profile'/"profile" to prove the
+// scaffolded key is actually read. Keep this as a real string, not just the regex.
+const CONFIG_KEY = 'profile';
+
 function resolveProfile(vaultPath) {
   try {
     const cfg = fs.readFileSync(path.join(vaultPath, '_claude', '.studio-config'), 'utf8');
-    const m = cfg.match(/^profile=(\S+)$/m);
+    const m = cfg.match(new RegExp('^' + CONFIG_KEY + '=(\\S+)$', 'm'));
     if (m && TABLES[m[1]]) return m[1];
   } catch { /* absent config -> default */ }
   return 'pro';

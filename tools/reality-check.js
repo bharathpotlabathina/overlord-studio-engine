@@ -47,7 +47,12 @@ function check(vaultPath) {
 
   const refs = new Set();
   for (const f of files) {
-    const content = fs.readFileSync(path.join(vaultPath, f), 'utf8');
+    let content;
+    // tracked-but-deleted files (routine uncommitted vault state: `rm` without `git rm`)
+    // throw ENOENT here; the bash source tolerates this via `xargs grep ... 2>/dev/null` —
+    // skip unreadable files rather than crash the report-only tool.
+    try { content = fs.readFileSync(path.join(vaultPath, f), 'utf8'); }
+    catch { continue; }
     for (const m of content.matchAll(REF_RE)) {
       refs.add(m[0].slice(1, -1).replace(/ +$/, ''));
     }

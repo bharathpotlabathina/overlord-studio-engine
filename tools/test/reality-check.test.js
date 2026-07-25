@@ -60,6 +60,21 @@ test('clean vault reports none', () => {
   const r = check(v);
   assert.deepStrictEqual(r.broken, []);
   assert.deepStrictEqual(r.declared, []);
+  assert.ok(r.lines.includes('BROKEN: none'), '"BROKEN: none" line rendered when nothing broken');
+});
+
+test('tracked-but-deleted .md (rm without git rm) does not crash check() or the CLI', () => {
+  const v = fixtureVault();
+  // routine uncommitted vault state: file removed from disk, still tracked/staged in git
+  fs.unlinkSync(path.join(v, 'docs', 'live.md'));
+  assert.doesNotThrow(() => check(v));
+  const r = check(v);
+  // the deleted file's refs (setup/ghost.sh, setup/tool.sh --flag) must not contribute
+  assert.ok(!r.broken.includes('setup/ghost.sh'));
+  assert.ok(!r.broken.includes('setup/tool.sh --flag'));
+  assert.doesNotThrow(() => {
+    execFileSync('node', [path.join(__dirname, '..', 'reality-check.js'), v], { encoding: 'utf8' });
+  }, 'CLI must still exit 0 with a tracked-but-deleted file present');
 });
 
 test('CLI always exits 0, even with broken refs present', () => {

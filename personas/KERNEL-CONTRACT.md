@@ -10,7 +10,7 @@ this contract is what "conforms" means.
 ---
 role: <slug>                 # matches the /summon-<slug> command and flavour skin
 weight: rich | thin          # ratified per-role 2026-07-19
-model: <assignment>          # e.g. opus, sonnet, fable, opus-on-build
+model: <assignment>          # a tier (deep, standard) resolved through the plan profile — tools/profile.js
 standing-events: []          # events that auto-fire this role (empty = commissioned only)
 ---
 ```

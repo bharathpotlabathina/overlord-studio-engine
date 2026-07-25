@@ -1,7 +1,7 @@
 ---
 role: security
 weight: thin
-model: opus
+model: deep
 standing-events: [release-composed, security-surface-change]
 ---
 # Security Engineer — Kernel

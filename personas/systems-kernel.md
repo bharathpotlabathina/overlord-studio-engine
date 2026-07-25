@@ -1,7 +1,7 @@
 ---
 role: systems
 weight: thin
-model: opus
+model: deep
 standing-events: [spec-lands]
 ---
 # Systems Planner — Kernel

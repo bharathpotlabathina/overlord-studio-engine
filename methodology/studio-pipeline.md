@@ -36,7 +36,7 @@ Every state advance is **proposed, never automatic** — per-transition Director
 - `/code-review ultra` — the Stage 5 T3 whole-branch review, escalated, on **big sprints / phase boundaries**; smaller sprints keep inline `code-review` T3.
 - `/security-review` — standing Stage 5 gate on **security-surface work** (auth, PII, secrets, deploy/permission config, external input, anything shipping outward). A non-clear verdict blocks Built like a T3 blocker.
 
-**Design/Plan review pass (standard, locked 2026-07-09).** Every spec (Stage 2) and every plan (Stage 3), after the authoring skill's own self-review, gets **one independent adversarial review pass** by a fresh reviewer (systems, deep/Opus tier, no authoring context) that hunts Blockers/Importants **before** the artifact reaches the Director's approval gate. The author integrates the findings — or pushes back with a system-level reason (`receiving-code-review`); a re-verify follows only if the pass surfaced blockers that materially reworked the artifact. This is the design-time analogue of the build-time T1–T3 code review (§4): self-review is marking your own homework; the independent pass is where real blockers surface (e.g. an independent plan-structure review gate that caught 4 blockers self-review had missed). Applies to all pipeline work.
+**Design/Plan review pass (standard, locked 2026-07-09).** Every spec (Stage 2) and every plan (Stage 3), after the authoring skill's own self-review, gets **one independent adversarial review pass** by a fresh reviewer (systems, deep tier, no authoring context) that hunts Blockers/Importants **before** the artifact reaches the Director's approval gate. The author integrates the findings — or pushes back with a system-level reason (`receiving-code-review`); a re-verify follows only if the pass surfaced blockers that materially reworked the artifact. This is the design-time analogue of the build-time T1–T3 code review (§4): self-review is marking your own homework; the independent pass is where real blockers surface (e.g. an independent plan-structure review gate that caught 4 blockers self-review had missed). Applies to all pipeline work.
 
 ## 3. Model ladder
 
@@ -50,15 +50,15 @@ tier, security certification goes up a tier, and anything else escalates only
 when the dispatcher names why. Running the whole studio on an expensive tier
 is not rigor; it is paying for what the writing already does.
 
-**Tiers** (names used everywhere in this doc) and current mapping — this table is the only place model names appear:
+**Tiers** (names used everywhere in this doc) and current mapping — this table is the only place model names appear. The binding is resolved through the plan profile (`tools/profile.js`; `profile=` in `.studio-config`) — `max` and `pro` are the two shipped profiles:
 
-| Tier | Current binding | Used for |
-|---|---|---|
-| local model | a declared local model on the machine, where one exists — small bounded dispatches only per the brief-sizing rule | transcription-tier tasks, T1 spec-checks, style passes — **on machines that declare a local model** |
-| cheap | Haiku | transcription-tier tasks where no local model is declared or the dispatch exceeds the local-model band |
-| standard | Sonnet | standard-tier tasks, task reviews of small/mechanical diffs |
-| deep | Opus | judgment-tier tasks, planning, reviews of subtle diffs |
-| top | Fable (or best available) | design/strategy, final whole-branch review (T3) |
+| Tier | max | pro | Used for |
+|---|---|---|---|
+| local model | local | local | transcription-tier tasks, T1 spec-checks, style passes — **on machines that declare a local model** |
+| cheap | Haiku | Haiku | transcription-tier tasks where no local model is declared or the dispatch exceeds the local-model band |
+| standard | Sonnet | Sonnet | standard-tier tasks, task reviews of small/mechanical diffs |
+| deep | Opus | Sonnet | judgment-tier tasks, planning, reviews of subtle diffs |
+| top | Fable | Sonnet | design/strategy, final whole-branch review (T3) |
 
 **Who decides:** the Systems Planner rates every task at plan time — marker `transcription / standard / judgment` in the sprint plan. The phase controller dispatches the bound tier **mechanically**. No per-task Director gate (model choice is reversible).
 

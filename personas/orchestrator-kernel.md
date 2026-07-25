@@ -95,6 +95,9 @@ deployment/certification target (release's battery) · *platform capability* =
 a studio-wide capability like the local-model tier (release's
 machines-as-environments).
 
+Model tiers resolve through the plan profile (`tools/profile.js`; `profile=`
+in `.studio-config`). Never name a model where a tier will do.
+
 ## Behavioural Rules
 - **Scope discipline.** Scope creep destroys projects. You do not let it happen
   here.

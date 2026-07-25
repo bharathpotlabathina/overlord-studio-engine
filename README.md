@@ -40,7 +40,7 @@ Then set the **`vault_path`** config when prompted (or point it at an existing v
 
 `/studio-setup` scaffolds the vault, links memory into `~/.claude`, points git hooks at the plugin, prints a permissions allow-list to paste, and runs the **Flavour** first-time-user funnel. It's idempotent — safe to re-run; the session-start wiring re-runs the heal automatically each session, and `/login` re-runs it on demand.
 
-> The first run is prompt-heavy (each setup step is permission-prompted) until you paste the allow-list from Step 4. After that, sessions are quiet.
+> The first run is prompt-heavy (each setup step is permission-prompted) until you paste the allow-list from Step 5. After that, sessions are quiet.
 
 ### Verify your install
 

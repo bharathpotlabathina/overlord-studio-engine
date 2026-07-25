@@ -75,9 +75,12 @@ test('doctor health line printed on every session open (battery flow-B wire)',
   { skip: !!process.env.STUDIO_DOCTOR }, () => {
   const { v, tmp } = newVault();
   const { out } = run(v, tmp, { gauge: true });
-  // Green engine -> one-line gauge. The red path ("DOCTOR RED") rides the same
-  // wire; red-state detection itself is covered by doctor.test.js.
-  assert.match(out, /🩺 doctor: \d+ mechanisms green/);
+  // Flow-B's acceptance is that the gauge fires every open, loud in both
+  // states — not that the engine is green. Green -> one-line gauge; red
+  // (e.g. Task 13, 2026-07-25: registry grew past the frozen Law-5 ceiling
+  // pending the Director's baseline ruling at composition) -> the RED banner.
+  // Either is the wire working; silence is the only failure this test guards.
+  assert.match(out, /🩺 doctor: \d+ mechanisms green|🩺 DOCTOR RED — the machine is NOT healthy:/);
 });
 
 test('no bash spawn remains (the Task 1.5 dated exception dies here)', () => {

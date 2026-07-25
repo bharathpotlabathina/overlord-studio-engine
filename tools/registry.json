@@ -164,6 +164,38 @@
       "lastVerified": "2026-07-19",
       "home": "E",
       "note": "Task 6.2 \u2014 the Law-5 hard gate. HONESTLY RED until (a) the Director rules which N_old baseline binds (live=12 vs declared=20 \u2014 parked since Phase 0) and (b) cutover closes the dispositions. A count tool that reports pass on an overage would fail its own purpose; this one blocks."
+    },
+    {
+      "id": "plan-profile-resolution",
+      "trigger": "tools/doctor.js",
+      "check": "tools/test/profile.test.js",
+      "lastVerified": "2026-07-25",
+      "home": "E",
+      "note": "v0.2.0 M1 \u2014 tier->model resolution per plan profile (pro default: deep/top collapse to Sonnet; max: the Director's 2026-07-19 bindings). Reads profile= from _claude/.studio-config; surfaced as an informational doctor row (never turns doctor red, same law as reality-check below). Also consumed by tools/studio-setup.js and methodology/studio-pipeline.md."
+    },
+    {
+      "id": "reality-check",
+      "trigger": "tools/doctor.js",
+      "check": "tools/test/reality-check.test.js",
+      "lastVerified": "2026-07-25",
+      "home": "E",
+      "note": "v0.2.0 M3 (I-96 port) \u2014 docs-vs-machine drift: backtick-quoted, vault-rooted path refs in tracked markdown checked against disk. REPORT-ONLY, always exit 0 (ponytail precedent: skill-audit, verification-evidence \u2014 a block would false-positive on honest WIP). Surfaced as an informational doctor row (never turns doctor red) AND explicitly re-run at session close via methodology/playbooks/logout.md step 9; BROKEN lines feed _claude/reality-check-ignore.txt / reality-aspirational.txt, never a blocker."
+    },
+    {
+      "id": "skills-discovery-command",
+      "trigger": "commands/skills.md",
+      "check": "tools/checks/registry-schema-check.js",
+      "lastVerified": "2026-07-25",
+      "home": "E",
+      "note": "v0.2.0 M2 (I-49) \u2014 /skills lists what the studio can do in one screen: every commands/*.md, every skills/ dir's SKILL.md description, every tools/registry.json mechanism's name+purpose. Check field nominal (borrows the registry schema check that guarantees the mechanism list it reads is well-formed) \u2014 the command is LLM-instruction-following, not a script, so there is no dedicated automated test; same shape as local-auth-gate's nominal check above."
+    },
+    {
+      "id": "retro-integrate",
+      "trigger": "commands/retro-integrate.md",
+      "check": "tools/test/studio-setup.test.js",
+      "lastVerified": "2026-07-25",
+      "home": "E",
+      "note": "v0.2.0 M3 \u2014 retro loop drain: /retro-integrate reads methodology/playbooks/retro-integrate.md (Orchestrator-only authority; Director approves every gated change) and processes _claude/retros/retro-log.md entries with Status: unintegrated. Check field covers the retro-log Signals/Claim template contract the playbook depends on. Session-init's unintegrated-count nudge (tools/studio-session-init.js) is the other, hook-triggered half of the loop; the drain itself stays manual by design."
     }
   ],
   "documents": [

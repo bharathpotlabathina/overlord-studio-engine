@@ -12,7 +12,7 @@ things, then runs the Flavour first-time-user experience. Everything here is
 **idempotent** — safe to re-run; `/login` calls it every session to self-heal.
 
 **Heads-up for the user (say this up front):** the first run is prompt-heavy —
-each Bash step is permission-prompted individually until the allow-list (Step 4)
+each Bash step is permission-prompted individually until the allow-list (Step 5)
 is pasted. After that, re-running completes cleanly and quietly.
 
 ## Inputs
@@ -46,7 +46,17 @@ Then confirm the scaffolded map validates (so a cold `/logout` runs clean):
 node "${CLAUDE_PLUGIN_ROOT}/tools/atlas-map-check.js" validate "<vault_path>/_claude/studio-atlas-map.json"
 ```
 
-## Step 4 — Permissions allow-list
+## Step 4 — Plan profile question
+
+Ask the user: "Which Claude plan runs this studio? (max / pro — pro is the
+safe default; max unlocks Opus/Fable tiers for planning and review)"
+
+Scaffold already seeded `profile=pro` into `.studio-config` (Steps 1–3). If
+the answer is `pro`, nothing to do. If the answer is `max`, write it as
+`profile=max` into `<vault_path>/_claude/.studio-config`, replacing the
+`profile=` line.
+
+## Step 5 — Permissions allow-list
 
 A plugin cannot add `settings.permissions.allow`. Print this **plugin-era**
 allow-list (git scoped to the vault via `-C`), substituting the real
@@ -66,7 +76,7 @@ Bash(pip install *)
 mcp__Claude_Preview__preview_start
 ```
 
-## Step 5 — Flavour first-time-user setup
+## Step 6 — Flavour first-time-user setup
 
 Wiring done — now offer the Flavour funnel. Invoke the **`flavour-setup`** skill,
 which runs the flavour? → genre → universe → faction funnel and generates the

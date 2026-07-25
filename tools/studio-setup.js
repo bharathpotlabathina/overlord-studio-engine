@@ -51,6 +51,11 @@ const STUDIO_CONFIG_SEED = `# autosync — the Stop hook's git behaviour, in THI
 #   on       stage + commit + push. Only for a vault you own.
 # Anything else — including a typo — is treated as off.
 autosync=off
+# profile — which Claude plan runs this studio (read by tools/profile.js).
+#   pro   (default, safe) deep/top tiers collapse to Sonnet.
+#   max   unlocks Opus/Fable for the deep/top tiers.
+# Anything else falls back to pro.
+profile=pro
 `;
 
 function ensureFile(p, content) { if (!fs.existsSync(p)) fs.writeFileSync(p, content); }

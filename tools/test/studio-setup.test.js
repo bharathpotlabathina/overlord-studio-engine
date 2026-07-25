@@ -59,6 +59,13 @@ test('scaffold defaults autosync to OFF — a fresh vault never auto-pushes', ()
   assert.doesNotMatch(cfg, /^autosync=on$/m);
 });
 
+test('scaffold defaults profile to pro — the safe default plan tier', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const cfg = fs.readFileSync(path.join(vault, '_claude/.studio-config'), 'utf8');
+  assert.match(cfg, /^profile=pro$/m, 'profile must default to pro in a scaffolded vault');
+});
+
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {
   const vault = path.join(tmp(), 'v');
   execFileSync('node', [SETUP, 'scaffold', vault]);

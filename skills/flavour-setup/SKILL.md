@@ -130,7 +130,7 @@ language_cues:
 ```
 
 `language_cues` are *light* — a couple of words the team might reach for, a
-register note. Not a dialect, not a catchphrase mandate. 2–4 of them.
+tone note. Not a dialect, not a catchphrase mandate. 2–4 of them.
 
 ### The 9 role skins
 

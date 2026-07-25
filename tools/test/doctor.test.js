@@ -208,6 +208,20 @@ test('doctor reports the active plan profile', () => {
   assert.match(r.out, /profile: (pro|max)/);
 });
 
+// Reproduces the final-review CRITICAL: the profile row must read the VAULT's
+// .studio-config, not the engine root's (which has none, so it always fell back
+// to pro regardless of the vault's real setting).
+test('doctor profile row reads the resolved vault, not the engine root', () => {
+  const root = newRoot();
+  writeRegistry(root, []);
+  const vault = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-vault-'));
+  fs.mkdirSync(path.join(vault, '_claude'), { recursive: true });
+  fs.writeFileSync(path.join(vault, '_claude', '.studio-config'), 'profile=max\n');
+  const r = run(root, vault);
+  assert.strictEqual(r.code, 0);
+  assert.match(r.out, /profile: max/);
+});
+
 // --- reality-check row (v0.2.0 M3: informational, report-only law — this row can
 // never turn the run red, same shape as the profile row above).
 

@@ -35,7 +35,6 @@ No marketplace access (offline / local clone)? The setup skill's underlying comm
 ```
 node <clone-path>/tools/studio-setup.js all <your-vault-path>
 ```
-```
 
 (Working from a local clone? `/plugin marketplace add /path/to/your/clone` works the same way.)
 

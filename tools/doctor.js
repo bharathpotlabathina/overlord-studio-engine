@@ -118,11 +118,13 @@ function runDoctor(root, vault) {
   if (staleness.stale) ok = false;
   lines.push(staleness.line);
 
-  // Active plan profile (v0.2.0 M1) — informational only: pro and max are both
-  // valid states, so this row can never turn the run red. Built-in like
-  // install-staleness above, not a registered mechanism (Law-5 ceiling).
+  // Active plan profile (v0.2.0 M1) — informational row (registered as a
+  // mechanism; never turns the run red): pro and max are both valid states.
+  // Target is the resolved VAULT, same reasoning as reality-check below —
+  // the engine root has no .studio-config, so reading root always fell back
+  // to pro regardless of the vault's real setting.
   const { resolveProfile } = require('./profile.js');
-  lines.push(`profile: ${resolveProfile(root)}`);
+  lines.push(`profile: ${resolveProfile(vault)}`);
 
   // reality-check row (v0.2.0 M3) — informational only, same law as profile above:
   // report-only forever, this row can never turn the run red. Target is the resolved

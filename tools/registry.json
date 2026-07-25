@@ -6,8 +6,9 @@
     "N_old_declared": 20,
     "projected_N_new": "17-21",
     "finding": "RULED 2026-07-19 (Director, hybrid): declared baseline (20) binds for the Stage-3 transition gate; at cutover the then-live count freezes into frozenLiveBaseline and becomes the ceiling (count may only shrink). Decision of record: vault _claude/memory/studio_decisions.md.",
-    "frozenLiveBaseline": 19,
-    "frozenAt": "2026-07-19 cutover \u2014 engine wires live, W01-W09+W12 retired in place (epitaph: vault _claude/retired-wires/)"
+    "frozenLiveBaseline": 23,
+    "frozenAt": "2026-07-19 cutover \u2014 engine wires live, W01-W09+W12 retired in place (epitaph: vault _claude/retired-wires/)",
+    "ruling_2026_07_25": "RULED 2026-07-25 (Director, v0.2.0 composition \u2014 verbatim: 'approved on both. baseline 23'): frozenLiveBaseline 19 -> 23 for the four deliberate v0.2.0 mechanisms (plan-profile-resolution, reality-check, skills-discovery-command, retro-integrate), each with named trigger/check/home. The count may only shrink from 23 hereafter; growth fails the gate. Records: vault docs/superpowers/releases/v0.2.0-composition.md."
   },
   "wiringRoots": [
     "hooks"

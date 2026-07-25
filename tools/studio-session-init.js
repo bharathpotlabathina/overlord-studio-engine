@@ -38,7 +38,7 @@ function main() {
   // (STUDIO_DOCTOR set), skip the gauge — doctor→check→doctor is a fork bomb.
   if (!process.env.STUDIO_DOCTOR) try {
     const { runDoctor } = require('./doctor.js');
-    const { ok, lines } = runDoctor(path.resolve(__dirname, '..'));
+    const { ok, lines } = runDoctor(path.resolve(__dirname, '..'), VAULT);
     if (ok) {
       const n = (lines.join('\n').match(/checked (\d+)/) || [])[1] || '?';
       console.log(`🩺 doctor: ${n} mechanisms green`);

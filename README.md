@@ -53,6 +53,12 @@ node tools/doctor.js                # the wiring registry health check
 
 Both must come back clean (suite all-pass; doctor reports every mechanism green).
 
+## What this costs to run
+
+Every role runs on **Sonnet** by default — the `pro` profile, safe for any Claude plan, never leaves it.
+
+Opt into the `max` profile (`profile=max` in `_claude/.studio-config`) and two things escalate: planning (Systems) and security certification (Security) dispatch to **Opus** — a handful of calls per project, not a standing cost — and the mandatory final whole-branch review escalates to **Fable** when it's available on your plan. Everything else, on either profile, stays on Sonnet.
+
 ## Flavour — the theming layer
 
 Instead of shipping a fixed persona, the engine generates yours. The FTUE funnel walks **flavour? → genre → universe → faction**, then produces an honorific, a mood, role names, and light thematic language. Reverence toward you (the studio director) is always on; everything else is yours to pick.

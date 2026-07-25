@@ -38,6 +38,32 @@ const HANDOFF_SEED = `# Handoff
 > if it is growing, the history belongs in \`_claude/session-log.md\`.
 `;
 
+// Retro log template (v0.2.0 M3): the format /retro-integrate and the session-init
+// nudge both read. Header only — entries are appended by the studio, never seeded.
+const RETRO_LOG_SEED = `# Retro Log
+
+Sprint/phase-close learnings. Append-only, newest at bottom. Capture is open;
+analysis + integration are the Orchestrator's authority (\`/retro-integrate\`).
+
+Entry format:
+
+    ## YYYY-MM-DD · <sprint / capability id> · <owner>
+    - Signals: findings=<n> escalations=<n> rework=<n>   (sprint counts; \`?\` if unmeasured)
+    - Learning: <insight, 1-2 lines>
+    - Target: memory | kernel:<role> | sot-rule | pipeline | just-noted
+    - Status: unintegrated
+    - Claim: <only when Target is a durable change: one falsifiable line — what should stop
+      happening if this integration works. Verified at a later drain; omit for just-noted.>
+
+\`Target\` = where this eventually lands (\`just-noted\` = recorded, implies no change).
+\`Status: unintegrated\` until the Orchestrator drains it via \`/retro-integrate\`.
+\`Signals\`: the sprint's fitness numbers — review findings, escalations to a higher tier,
+rework/reopened items. Three counts, one line, no dashboards; they are what \`Claim\`
+verdicts get checked against. \`?\` is honest.
+
+---
+`;
+
 // Vault-level switches, read by the tools. Defaults are the safe ones.
 // KILLED 2026-07-15: `personas=on`. It was the CAP-025 persona-vs-role-generic
 // toggle (2026-07-06) and the flavour system superseded it nine days later —
@@ -65,10 +91,11 @@ function isGitRepo(dir) {
 }
 
 function scaffold(V) {
-  for (const d of ['_claude/memory', '_claude/atlas-staging', '_claude/flavours', 'roles', 'Projects']) {
+  for (const d of ['_claude/memory', '_claude/atlas-staging', '_claude/flavours', '_claude/retros', 'roles', 'Projects']) {
     fs.mkdirSync(path.join(V, d), { recursive: true });
   }
   ensureFile(path.join(V, '_claude/memory/MEMORY.md'), '# Memory Index\n');
+  ensureFile(path.join(V, '_claude/retros/retro-log.md'), RETRO_LOG_SEED);
   ensureFile(path.join(V, '_claude/studio-atlas-map.json'), EMPTY_MAP);
   for (const f of ['backlog.md', 'session-log.md', 'studio-brief.md']) {
     ensureFile(path.join(V, '_claude', f), `# ${f.replace(/\.md$/, '')}\n`);

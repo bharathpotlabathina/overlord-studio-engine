@@ -61,6 +61,13 @@ test('open retro entries -> counted nudge (real retro-log format); none -> silen
   assert.match(run(v, tmp).out, /2 unintegrated retro entries/);
 });
 
+test('no unintegrated retro entries -> nudge absent', () => {
+  const { v, tmp } = newVault();
+  fs.writeFileSync(path.join(v, '_claude', 'retros', 'retro-log.md'),
+    '- Learning: one\n- Status: integrated\n');
+  assert.doesNotMatch(run(v, tmp).out, /unintegrated retro/);
+});
+
 // Skipped when this file is itself running as a doctor check (STUDIO_DOCTOR set):
 // inside that subtree the gauge is suppressed BY DESIGN (re-entrancy guard), so
 // asserting its presence there would fail the very mechanism it protects.

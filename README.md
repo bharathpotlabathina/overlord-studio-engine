@@ -85,7 +85,7 @@ Summon any role for deep interactive work; the orchestrator dispatches bounded w
 | `/summon-release` | Release engineering — environments, release composition; gates production |
 | `/summon-security` | Security engineering — security certificates feed every go/no-go |
 
-Other commands: `/login` · `/logout` · `/flavour` · `/project-health` · `/context-budget` · `/silent-failure-hunter` · `/atlas-propose` · `/atlas-map-review` · `/update-source-of-truth`.
+Other commands: `/login` · `/logout` · `/flavour` · `/project-health` · `/context-budget` · `/silent-failure-hunter` · `/atlas-propose` · `/atlas-map-review` · `/update-source-of-truth` · `/retro-integrate`.
 
 ## Structure
 

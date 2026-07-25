@@ -82,6 +82,24 @@ test('scaffold seeds the reality-check registers', () => {
   assert.match(fs.readFileSync(path.join(vault, '_claude/reality-check-ignore.txt'), 'utf8'), /CUSTOM/);
 });
 
+// --- retro log (v0.2.0 M3: scaffold seeds the format template so the nudge and
+// /retro-integrate have something real to read on a fresh vault).
+
+test('scaffold seeds the retro-log template with the Signals/Claim entry format', () => {
+  const vault = path.join(tmp(), 'v');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  const p = path.join(vault, '_claude/retros/retro-log.md');
+  assert.ok(fs.existsSync(p));
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text, /Signals:/);
+  assert.match(text, /Claim:/);
+
+  // Idempotent: don't clobber a vault's own entries.
+  fs.writeFileSync(p, 'CUSTOM ENTRY\n');
+  execFileSync('node', [SETUP, 'scaffold', vault]);
+  assert.match(fs.readFileSync(p, 'utf8'), /CUSTOM ENTRY/);
+});
+
 test('wire-hooks points a repo core.hooksPath at the plugin tools dir', () => {
   const vault = path.join(tmp(), 'v');
   execFileSync('node', [SETUP, 'scaffold', vault]);

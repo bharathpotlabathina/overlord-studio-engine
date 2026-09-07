@@ -99,41 +99,6 @@ function main() {
     }
   }
 
-  // Self-improvement: headroom learn (CAP-039). Personal-machine convenience —
-  // degrade silently if the tool isn't installed; a future installer's machine
-  // may not have it, and that must never block session open. Regex verified
-  // 2026-09-07 against real headroom 0.27.0 output (source: cli/learn.py) —
-  // our exact invocation prints "  Recommendations: N" on the single-project
-  // analysis path regardless of --apply (that line is emitted before the
-  // write step, per source), not the assumed "N recommendation(s)" (that
-  // phrasing only appears in the --all cross-project summary line).
-  // Re-entrancy: headroom's analysis backend can spawn a nested `claude` CLI,
-  // whose own SessionStart would re-enter this exact block with no guard
-  // otherwise — same pattern as the STUDIO_DOCTOR gate above.
-  // DELIBERATELY DRY-RUN (no --apply): a whole-branch review found --apply's
-  // real write targets are the vault's root CLAUDE.md and MEMORY.md — a
-  // materially bigger blast radius than "context-only" as originally
-  // described when auto-apply was first authorized. Surfacing the count is
-  // safe and useful on its own; unattended writes to those two specific
-  // files need explicit reconfirmation, naming them, before --apply is
-  // added back — not an assumption the earlier context-only answer covers it.
-  // Timeout: headroom's own CLI backend budgets up to ~300s wall-clock for a
-  // real analysis. Closing that gap fully would mean session open can hang
-  // up to 5 minutes; capped at 120s instead — a deliberate trade-off, not a
-  // full fix. A run that needs longer is killed (caught below, no crash) and
-  // the banner silently doesn't print that day — cosmetic, not blocking,
-  // same failure class the recursion guard and silent-catch already accept.
-  if (!process.env.STUDIO_HEADROOM_RAN) try {
-    const hOut = execFileSync('headroom', ['learn', '--agent', 'claude'], {
-      cwd: VAULT, encoding: 'utf8', timeout: 120_000,
-      env: { ...process.env, STUDIO_HEADROOM_RAN: '1' },
-    });
-    const found = (hOut.match(/Recommendations: (\d+)/) || [])[1];
-    if (found && Number(found) > 0) {
-      console.log(`🧠 headroom learn found ${found} recommendation(s) — run 'headroom learn --apply' by hand to write them.`);
-    }
-  } catch { /* not installed, or a bad run — never block session open on this */ }
-
   console.log(`Vault synced — ${localHM()}`);
 }
 

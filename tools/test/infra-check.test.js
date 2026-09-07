@@ -114,6 +114,87 @@ test('M4 tool-default vector: MCP config carrying a prod project ref -> fail; re
   assert.strictEqual(run(r, home).code, 0);
 });
 
+// Coverage reporting (2026-07-27): a bare "checked N invariants, all hold" cannot be
+// told apart from a run where half the groups had no inputs to look at. On the product
+// repo that read as a full pass while env/mcp/vercel were never opened — the gitignored
+// groups are absent from every git worktree, and this studio works out of worktrees.
+// The count is not the coverage; the output must name what it did not check.
+function notApplicable(out) {
+  const m = out.match(/not applicable \(no inputs here\): ([^—\n]*)/);
+  return m ? m[1].trim().split(/,\s*/) : [];
+}
+
+// A configured repo whose only inputs are the migrations dir and ~/.pgpass.
+function partialRepo() {
+  const { r, home } = newRepo(BASE);
+  fs.mkdirSync(path.join(r, 'migrations'));
+  fs.writeFileSync(path.join(r, 'migrations', '001_a.sql'),
+    'CREATE TABLE users (id int);\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\n');
+  fs.writeFileSync(path.join(home, '.pgpass'), 'db.devref.supabase.co:5432:dev:user:pw\n');
+  return { r, home };
+}
+
+test('groups with no inputs are named, not silently folded into a green count', () => {
+  const { r, home } = partialRepo();
+  const res = run(r, home);
+  assert.strictEqual(res.code, 0, res.out);
+  assert.match(res.out, /checked \d+ invariants?, all hold/);
+  assert.deepStrictEqual(notApplicable(res.out).sort(), ['env', 'mcp', 'vercel']);
+});
+
+test('a failing board also reports what it did not check', () => {
+  const { r, home } = partialRepo();
+  fs.writeFileSync(path.join(r, 'migrations', '002_b.sql'), 'CREATE TABLE orders (id int);\n');
+  const bad = run(r, home);
+  assert.notStrictEqual(bad.code, 0);
+  assert.deepStrictEqual(notApplicable(bad.out).sort(), ['env', 'mcp', 'vercel']);
+});
+
+test('every group applicable -> no not-applicable clause at all', () => {
+  const { r, home } = partialRepo();
+  fs.writeFileSync(path.join(r, '.env'), 'DATABASE_URL=postgres://db.devref.supabase.co/dev\n');
+  fs.writeFileSync(path.join(r, '.mcp.json'), JSON.stringify({ mcpServers: {} }));
+  fs.mkdirSync(path.join(r, '.vercel'));
+  fs.writeFileSync(path.join(r, '.vercel', 'project.json'), JSON.stringify({ projectId: 'prj_dev' }));
+  const res = run(r, home);
+  assert.strictEqual(res.code, 0, res.out);
+  assert.doesNotMatch(res.out, /not applicable/);
+});
+
+// The worktree trap that produced the whole finding: .env*, .mcp.json and .vercel/ are
+// gitignored, so they exist only in the main checkout and never in a linked worktree.
+test('running in a git worktree says where the missing infra files actually live', () => {
+  const { r, home } = partialRepo();
+  fs.writeFileSync(path.join(r, '.git'), 'gitdir: /elsewhere/.git/worktrees/wt\n');
+  const res = run(r, home);
+  assert.strictEqual(res.code, 0, res.out);
+  assert.match(res.out, /worktree/i);
+  assert.match(res.out, /main checkout/i);
+});
+
+test('a real (non-worktree) checkout gets no worktree clause', () => {
+  const { r, home } = partialRepo();
+  fs.mkdirSync(path.join(r, '.git'));
+  const res = run(r, home);
+  assert.strictEqual(res.code, 0, res.out);
+  assert.doesNotMatch(res.out, /worktree/i);
+});
+
+// M4 tool-default vector, second filename: Vercel writes .vercel/repo.json (not
+// project.json) when the directory is linked through a git remote. The product repo
+// had exactly that — the prod project link sat unscanned for the group's whole life.
+test('M4: .vercel/repo.json carrying a prod project id -> fail; scrub -> pass', () => {
+  const { r, home } = newRepo(BASE);
+  fs.mkdirSync(path.join(r, '.vercel'));
+  const p = path.join(r, '.vercel', 'repo.json');
+  fs.writeFileSync(p, JSON.stringify({ projects: [{ id: 'prodref1234', name: 'app' }] }));
+  const bad = run(r, home);
+  assert.notStrictEqual(bad.code, 0);
+  assert.match(bad.out, /repo\.json/);
+  fs.writeFileSync(p, JSON.stringify({ projects: [{ id: 'devref', name: 'app' }] }));
+  assert.strictEqual(run(r, home).code, 0);
+});
+
 // The lockdown form: RLS enabled dynamically inside a DO
 // block, FOREACH over an array of table names. Static scan read it as absent —
 // 4 false positives on the first product run, all live-disproven 2026-07-20.

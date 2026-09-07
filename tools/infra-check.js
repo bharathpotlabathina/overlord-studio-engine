@@ -22,7 +22,26 @@ const os = require('os');
 const path = require('path');
 const { check: dupeCheck } = require('./migration-guard.js');
 
-const GROUP_COUNT = 6;
+const GROUPS = ['env', 'rls', 'dupes', 'pgpass', 'mcp', 'vercel'];
+const GROUP_COUNT = GROUPS.length;
+
+// A count of invariants is not a statement of coverage. "checked 3 invariants, all hold"
+// reads identically whether three groups passed and three had nothing to look at — which
+// is how the product repo read as a full pass while env/mcp/vercel were never opened
+// (2026-07-27). Every terminal line now names the groups that had no inputs.
+function coverage(applicable, root) {
+  const na = GROUPS.filter((g) => !applicable.has(g));
+  if (!na.length) return '';
+  let s = `${applicable.size} of ${GROUP_COUNT} groups applicable; not applicable (no inputs here): ${na.join(', ')}`;
+  // A linked worktree has .git as a file, not a directory. The gitignored groups
+  // (.env*, .mcp.json, .vercel/) are never checked out into one, so their silence there
+  // is a coverage hole rather than a clean repo — say so instead of implying the latter.
+  const dotgit = path.join(root, '.git');
+  if (fs.existsSync(dotgit) && fs.statSync(dotgit).isFile()) {
+    s += ' — running in a git worktree; gitignored infra files live in the main checkout, re-run there for real coverage';
+  }
+  return s;
+}
 
 function loadConfig(root) {
   const p = path.join(root, 'infra-check.json');
@@ -60,6 +79,7 @@ function main() {
   }
   const prodIds = cfg.prodIdentifiers;
   const failures = [];
+  const applicable = new Set();
   let checked = 0;
 
   // env group
@@ -67,6 +87,7 @@ function main() {
     const p = path.join(root, f);
     if (!fs.existsSync(p)) continue;
     checked += 1;
+    applicable.add('env');
     const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
     if (hit) failures.push(`${f}: contains prod identifier "${hit}" — preview/dev must never point at prod`);
   }
@@ -78,6 +99,7 @@ function main() {
     const sqlFiles = fs.readdirSync(abs).filter((f) => f.endsWith('.sql'));
     const corpus = sqlFiles.map((f) => fs.readFileSync(path.join(abs, f), 'utf8')).join('\n');
     checked += 1;
+    applicable.add('rls');
     const created = [...corpus.matchAll(/CREATE TABLE (?:IF NOT EXISTS )?"?([\w.]+)"?/gi)].map((m) => m[1]);
     const covered = lockdownCovered(corpus);
     for (const t of created) {
@@ -86,6 +108,7 @@ function main() {
       if (!rls.test(corpus) && !covered.has(bare.toLowerCase())) failures.push(`${dir}: table "${t}" created without ENABLE ROW LEVEL SECURITY`);
     }
     checked += 1;
+    applicable.add('dupes');
     // dupeCheck prints its own findings; capture via return code only.
     const origLog = console.log;
     let dupeOut = '';
@@ -100,6 +123,7 @@ function main() {
     const p = path.join(os.homedir(), '.pgpass');
     if (fs.existsSync(p)) {
       checked += 1;
+      applicable.add('pgpass');
       const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
       if (hit) failures.push(`~/.pgpass: carries prod host "${hit}" — a dev-context tool default reaching prod (M4)`);
     }
@@ -110,30 +134,35 @@ function main() {
     const p = path.isAbsolute(f) ? f : path.join(root, f);
     if (!fs.existsSync(p)) continue;
     checked += 1;
+    applicable.add('mcp');
     const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
     if (hit) failures.push(`${f}: MCP config resolves to prod identifier "${hit}" (M4)`);
   }
 
-  // vercel group (M4)
-  {
-    const p = path.join(root, '.vercel', 'project.json');
-    if (fs.existsSync(p)) {
-      checked += 1;
-      const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
-      if (hit) failures.push(`.vercel/project.json: linked to prod project "${hit}" (M4)`);
-    }
+  // vercel group (M4). Both link formats: project.json for a plain `vercel link`,
+  // repo.json when the directory is linked through its git remote. Only project.json was
+  // ever read, so a repo.json-linked checkout had this group silently inert (2026-07-27).
+  for (const name of ['project.json', 'repo.json']) {
+    const p = path.join(root, '.vercel', name);
+    if (!fs.existsSync(p)) continue;
+    checked += 1;
+    applicable.add('vercel');
+    const hit = containsProdId(fs.readFileSync(p, 'utf8'), prodIds);
+    if (hit) failures.push(`.vercel/${name}: linked to prod project "${hit}" (M4)`);
   }
 
   if (checked === 0) {
     console.log(`no infra configured — 0 of ${GROUP_COUNT} invariant groups applicable (cold install)`);
     return 0;
   }
+  const cov = coverage(applicable, root);
   if (failures.length) {
     console.log(`INFRA-CHECK FAILED — ${failures.length} invariant violation(s):`);
     failures.forEach((f) => console.log('  ' + f));
+    if (cov) console.log(cov);
     return 1;
   }
-  console.log(`checked ${checked} invariant${checked === 1 ? '' : 's'}, all hold`);
+  console.log(`checked ${checked} invariant${checked === 1 ? '' : 's'}, all hold${cov ? ' — ' + cov : ''}`);
   return 0;
 }
 
